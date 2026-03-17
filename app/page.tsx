@@ -6,6 +6,7 @@ import SurveyScreen from '@/components/SurveyScreen';
 import LoadingScreen from '@/components/LoadingScreen';
 import ChronometerScreen from '@/components/ChronometerScreen';
 import ResultsScreen from '@/components/ResultsScreen';
+import LanguageSelector from '@/components/LanguageSelector';
 
 function AppRouter() {
   const { stage } = useApp();
@@ -29,6 +30,7 @@ function AppRouter() {
 export default function Home() {
   return (
     <AppProvider>
+      <LanguageSelector />
       <AppRouter />
     </AppProvider>
   );

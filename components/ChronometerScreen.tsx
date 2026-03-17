@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useApp, RoundResult } from '@/lib/AppContext';
+import { t } from '@/lib/i18n';
 import { Play, Square, Timer, CheckCircle2, Trophy } from 'lucide-react';
 
 const ROUNDS = [
@@ -15,7 +16,7 @@ const ROUNDS = [
 type Phase = 'idle' | 'running' | 'done';
 
 export default function ChronometerScreen() {
-  const { addRoundResult, setStage, roundResults, currentRound, user } = useApp();
+  const { addRoundResult, setStage, roundResults, currentRound, user, language } = useApp();
 
   const [phase, setPhase] = useState<Phase>('idle');
   const [completedRounds, setCompletedRounds] = useState<RoundResult[]>([]);
@@ -88,30 +89,34 @@ export default function ChronometerScreen() {
   };
 
   const getErrorLabel = (pct: number) => {
-    if (pct > 0) return `+${pct.toFixed(1)}% geç bastın`;
-    return `${pct.toFixed(1)}% erken bastın`;
+    if (pct > 0) return t(language, 'chronoStoppedLate', { pct: pct.toFixed(1) });
+    return t(language, 'chronoStoppedEarly', { pct: pct.toFixed(1) });
   };
 
   return (
-    <div className="min-h-dvh flex flex-col items-center justify-center px-4 py-8 relative">
+    <div className="absolute inset-0 overflow-y-auto overflow-x-hidden">
       <div className="orb orb-purple" style={{ opacity: 0.15 }} />
       <div className="orb orb-cyan" style={{ opacity: 0.1 }} />
-      <div className="bg-grid fixed inset-0 z-0 pointer-events-none" />
+      <div className="bg-grid absolute inset-0 z-0 pointer-events-none" />
 
-      <div className="relative z-10 w-full max-w-md">
+      <div className="min-h-full w-full flex items-center justify-center p-4 py-12 relative z-10">
+        <div className="w-full max-w-md mx-auto">
         {/* Header */}
-        <div className="text-center mb-6">
-          <p className="text-xs font-medium mb-1" style={{ color: 'var(--text-muted)' }}>
-            Hoş geldin, {user?.name}
-          </p>
-          <h1 className="text-2xl font-bold gradient-text">Kör Kronometre Testi</h1>
-          <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>
-            İçinden say ve hissettiğinde durdur
-          </p>
-        </div>
+        {!isFinished && (
+          <div className="text-center mb-6">
+            <p className="text-xs font-medium mb-1" style={{ color: 'var(--text-muted)' }}>
+              {t(language, 'welcome', { name: user?.name || '' })}
+            </p>
+            <h1 className="text-2xl font-bold gradient-text">{t(language, 'chronoTitle')}</h1>
+            <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>
+              {t(language, 'chronoDesc')}
+            </p>
+          </div>
+        )}
 
         {/* Round indicators */}
-        <div className="flex gap-2 justify-center mb-8">
+        {!isFinished && (
+          <div className="flex gap-2 justify-center mb-8">
           {ROUNDS.map((r, i) => (
             <div
               key={i}
@@ -144,60 +149,65 @@ export default function ChronometerScreen() {
                 {i < completedRounds.length ? '✓' : i + 1}
               </div>
               <span className="text-xs" style={{ color: i < completedRounds.length ? '#7c3aed' : 'var(--text-muted)' }}>
-                {r.target}s
+                {r.target} {t(language, 'seconds')}
               </span>
             </div>
           ))}
         </div>
+        )}
 
         {/* Main card */}
         {!isFinished ? (
           <div className="glass-card p-8 text-center">
             {/* Round label */}
             <p className="text-xs font-semibold mb-1" style={{ color: 'var(--accent-purple-light)' }}>
-              TUR {roundIndex + 1} / {ROUNDS.length}
+              {t(language, 'chronoRoundOf', { current: roundIndex + 1, total: ROUNDS.length })}
             </p>
 
             {/* Target duration — only if not running */}
             <div className="mb-8">
               <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                Hedef Süre
+                {t(language, 'targetTime')}
               </p>
               <p className="text-5xl font-black mt-1 gradient-text">
-                {currentRoundData?.label}
+                {currentRoundData?.target} {t(language, 'seconds')}
               </p>
             </div>
 
             {/* Animated circle */}
-            <div
-              className="mx-auto mb-8 rounded-full flex items-center justify-center transition-all duration-150"
-              style={{
-                width: 140,
-                height: 140,
-                transform: phase === 'running' ? `scale(${pulseSize})` : 'scale(1)',
-                background:
-                  phase === 'running'
-                    ? 'radial-gradient(circle, rgba(124,58,237,0.4), rgba(124,58,237,0.1))'
-                    : 'rgba(18,18,31,0.8)',
-                border: phase === 'running' ? '2px solid #7c3aed' : '2px solid var(--border-accent)',
-                boxShadow: phase === 'running' ? '0 0 40px rgba(124,58,237,0.5)' : 'none',
-              }}
-            >
-              {phase === 'idle' && (
-                <Timer size={40} style={{ color: 'var(--text-muted)' }} />
-              )}
-              {phase === 'running' && (
-                <div className="text-center">
-                  <div
-                    className="w-4 h-4 rounded-full mx-auto mb-2 animate-pulse"
-                    style={{ background: '#7c3aed', boxShadow: '0 0 15px #7c3aed' }}
-                  />
-                  <p className="text-xs font-semibold" style={{ color: '#a855f7' }}>sayıyor...</p>
-                </div>
-              )}
-              {phase === 'done' && showBrief && (
-                <CheckCircle2 size={40} style={{ color: '#10b981' }} />
-              )}
+            <div className="w-full flex justify-center mb-8">
+              <div className="relative flex items-center justify-center overflow-hidden rounded-full" style={{ width: 180, height: 180 }}>
+                <div
+                  className="rounded-full flex items-center justify-center transition-all duration-150"
+                  style={{
+                  width: 140,
+                  height: 140,
+                  transform: phase === 'running' ? `scale(${pulseSize})` : 'scale(1)',
+                  background:
+                    phase === 'running'
+                      ? 'radial-gradient(circle, rgba(124,58,237,0.4), rgba(124,58,237,0.1))'
+                      : 'rgba(18,18,31,0.8)',
+                  border: phase === 'running' ? '2px solid #7c3aed' : '2px solid var(--border-accent)',
+                  boxShadow: phase === 'running' ? '0 0 40px rgba(124,58,237,0.5)' : 'none',
+                }}
+              >
+                {phase === 'idle' && (
+                  <Timer size={40} style={{ color: 'var(--text-muted)' }} />
+                )}
+                {phase === 'running' && (
+                  <div className="text-center">
+                    <div
+                      className="w-4 h-4 rounded-full mx-auto mb-2 animate-pulse"
+                      style={{ background: '#7c3aed', boxShadow: '0 0 15px #7c3aed' }}
+                    />
+                    <p className="text-xs font-semibold" style={{ color: '#a855f7' }}>{t(language, 'counting')}</p>
+                  </div>
+                )}
+                {phase === 'done' && showBrief && (
+                  <CheckCircle2 size={40} style={{ color: '#10b981' }} />
+                )}
+              </div>
+            </div>
             </div>
 
             {/* Brief result flash */}
@@ -215,8 +225,8 @@ export default function ChronometerScreen() {
             {/* Instructions */}
             {phase === 'idle' && !showBrief && (
               <p className="text-sm mb-6" style={{ color: 'var(--text-muted)' }}>
-                Hazır olduğunda <strong style={{ color: 'var(--text-secondary)' }}>Başlat</strong>'a bas, <br />
-                {currentRoundData?.label} geçtiğini hissedince <strong style={{ color: 'var(--text-secondary)' }}>Durdur</strong>'a bas.
+                {t(language, 'readyStart')} <strong style={{ color: 'var(--text-secondary)' }}>{t(language, 'pressStart')}</strong>, <br />
+                {currentRoundData?.target} {t(language, 'seconds')} {t(language, 'whenFelt')} <strong style={{ color: 'var(--text-secondary)' }}>{t(language, 'pressStop')}</strong>.
               </p>
             )}
 
@@ -224,13 +234,13 @@ export default function ChronometerScreen() {
             {(phase === 'idle') && !showBrief && (
               <button onClick={handleStart} className="btn-primary w-full flex items-center justify-center gap-2">
                 <Play size={18} />
-                Başlat
+                {t(language, 'pressStart')}
               </button>
             )}
             {phase === 'running' && (
               <button onClick={handleStop} className="btn-danger w-full flex items-center justify-center gap-2">
                 <Square size={18} />
-                Durdur
+                {t(language, 'pressStop')}
               </button>
             )}
             {phase === 'done' && showBrief && roundIndex < ROUNDS.length && (
@@ -238,12 +248,12 @@ export default function ChronometerScreen() {
                 {roundIndex + 1 >= ROUNDS.length ? (
                   <>
                     <Trophy size={18} />
-                    Sonuçları Gör
+                    {t(language, 'seeResults')}
                   </>
                 ) : (
                   <>
-                    Sonraki Tur
-                    <span className="text-sm opacity-70">({ROUNDS[roundIndex]?.target}s)</span>
+                    {t(language, 'nextRound')}
+                    <span className="text-sm opacity-70">({ROUNDS[roundIndex]?.target} {t(language, 'seconds')})</span>
                   </>
                 )}
               </button>
@@ -251,22 +261,25 @@ export default function ChronometerScreen() {
           </div>
         ) : (
           /* All rounds done */
-          <div className="glass-card p-8 text-center">
-            <Trophy size={48} className="mx-auto mb-4" style={{ color: '#f59e0b' }} />
-            <h2 className="text-2xl font-bold mb-2 gradient-text">Test Tamamlandı!</h2>
-            <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>
-              5 tur başarıyla tamamlandı. Şimdi sonuçlarını analiz ediyoruz...
+          <div className="glass-card p-10 flex flex-col items-center justify-center text-center">
+            <Trophy size={64} className="mx-auto mb-6 flex-shrink-0" style={{ color: '#f59e0b' }} />
+            <h2 className="text-3xl font-bold mb-3 gradient-text">{t(language, 'testCompleted')}</h2>
+            <p className="text-base mb-8" style={{ color: 'var(--text-secondary)' }}>
+              {t(language, 'analyzingResults')}
             </p>
-            <button onClick={handleGoToResults} className="btn-primary w-full">
-              Sonuçlarımı Gör
+            <button onClick={handleGoToResults} className="btn-primary w-full py-4 text-lg">
+              {t(language, 'seeResults')}
             </button>
           </div>
         )}
 
         {/* Warning note */}
-        <p className="text-center text-xs mt-5" style={{ color: 'var(--text-muted)' }}>
-          ⚠️ Ekranı kapatma — kronometrenin göründüğü tek yer bu tur kartı
-        </p>
+        {!isFinished && (
+          <p className="text-center text-xs mt-5" style={{ color: 'var(--text-muted)' }}>
+            {t(language, 'warningScreen')}
+          </p>
+        )}
+      </div>
       </div>
     </div>
   );

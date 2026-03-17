@@ -2,19 +2,22 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useApp, Answer } from '@/lib/AppContext';
-import { questions, Question, Choice } from '@/lib/questionsData';
+import { Question, Choice } from '@/lib/questionsData';
+import { getLocalizedSurvey, surveyLabels } from '@/lib/surveyTranslations';
+import { t } from '@/lib/i18n';
 import { ChevronRight, ChevronLeft, BookOpen, FlaskConical } from 'lucide-react';
 
 export default function SurveyScreen() {
-  const { submitAnswer, answers, computeTPR, setStage } = useApp();
+  const { submitAnswer, answers, computeTPR, setStage, language } = useApp();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [localValue, setLocalValue] = useState<string>('');
   const [selectedChoice, setSelectedChoice] = useState<number | null>(null);
   const [direction, setDirection] = useState<'forward' | 'back'>('forward');
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const total = questions.length;
-  const q = questions[currentIndex];
+  const localizedQuestions = getLocalizedSurvey(language);
+  const total = localizedQuestions.length;
+  const q = localizedQuestions[currentIndex];
   const progress = ((currentIndex) / total) * 100;
 
   // Pre-fill from existing answers
@@ -76,34 +79,29 @@ export default function SurveyScreen() {
     lifestyle: '#10b981',
   };
 
-  const categoryLabels: Record<string, string> = {
-    sleep: 'Uyku',
-    screenTime: 'Ekran Süresi',
-    shortVideo: 'Kısa Video',
-    cognitive: 'Bilişsel',
-    lifestyle: 'Yaşam Tarzı',
-  };
-
   const color = categoryColors[q.category] || '#7c3aed';
+  const minText = surveyLabels.minLabel[language] || 'Min';
+  const maxText = surveyLabels.maxLabel[language] || 'Max';
 
   return (
-    <div className="min-h-dvh flex flex-col px-4 py-6 relative">
+    <div className="absolute inset-0 overflow-y-auto overflow-x-hidden">
       <div className="orb orb-purple" />
       <div className="orb orb-cyan" />
-      <div className="bg-grid fixed inset-0 z-0 pointer-events-none" />
+      <div className="bg-grid absolute inset-0 z-0 pointer-events-none" />
 
-      <div className="relative z-10 w-full max-w-lg mx-auto flex flex-col gap-6 flex-1">
+      <div className="min-h-full w-full flex items-center justify-center p-4 py-12 relative z-10">
+        <div className="w-full max-w-lg flex flex-col gap-6 mx-auto">
         {/* Header */}
         <div>
           <div className="flex justify-between items-center mb-1">
             <span className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>
-              Soru {currentIndex + 1} / {total}
+              {t(language, 'surveyQuestionOf', { current: currentIndex + 1, total })}
             </span>
             <span
               className="text-xs font-semibold px-2.5 py-1 rounded-full"
               style={{ background: `${color}20`, color, border: `1px solid ${color}40` }}
             >
-              {categoryLabels[q.category]}
+              {surveyLabels[q.category]?.[language] || q.category}
             </span>
           </div>
           {/* Progress bar */}
@@ -152,8 +150,8 @@ export default function SurveyScreen() {
                   )}
                 </div>
                 <div className="flex justify-between text-xs" style={{ color: 'var(--text-muted)' }}>
-                  <span>Min: {q.min} {q.unit}</span>
-                  <span>Max: {q.max} {q.unit}</span>
+                  <span>{minText}: {q.min} {q.unit}</span>
+                  <span>{maxText}: {q.max} {q.unit}</span>
                 </div>
               </div>
             )}
@@ -216,7 +214,7 @@ export default function SurveyScreen() {
               className="btn-outline flex items-center gap-1.5 px-5"
             >
               <ChevronLeft size={16} />
-              Geri
+              {t(language, 'surveyBtnBack')}
             </button>
           )}
           <button
@@ -225,10 +223,11 @@ export default function SurveyScreen() {
             className="btn-primary flex items-center justify-center gap-1.5 flex-1"
             style={{ opacity: canProceed() ? 1 : 0.4, cursor: canProceed() ? 'pointer' : 'not-allowed' }}
           >
-            {currentIndex === total - 1 ? 'Analizi Başlat' : 'Devam Et'}
+            {currentIndex === total - 1 ? t(language, 'surveyBtnStart') : t(language, 'surveyBtnNext')}
             <ChevronRight size={16} />
           </button>
         </div>
+      </div>
       </div>
     </div>
   );

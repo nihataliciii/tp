@@ -2,12 +2,13 @@
 
 import { useState } from 'react';
 import { useApp } from '@/lib/AppContext';
+import { t } from '@/lib/i18n';
 import { Brain, Eye, EyeOff, Zap, Lock, Mail, User } from 'lucide-react';
 
 type Mode = 'login' | 'signup';
 
 export default function AuthScreen() {
-  const { setStage, setUser } = useApp();
+  const { setStage, setUser, language } = useApp();
   const [mode, setMode] = useState<Mode>('login');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -16,11 +17,27 @@ export default function AuthScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // Sistemde kayıtlı mock veritabanı e-postaları
+  const REGISTERED_EMAILS = ['test@test.com', 'admin@admin.com', 'demo@test.com'];
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    if (!email || !password) { setError('Lütfen tüm alanları doldurun.'); return; }
-    if (mode === 'signup' && !name) { setError('İsmini girmeyi unutma.'); return; }
+    if (!email || !password) { setError(t(language, 'fillFields')); return; }
+    if (mode === 'signup' && !name) { setError(t(language, 'enterName')); return; }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError(t(language, 'invalidEmail'));
+      return;
+    }
+    
+    // Yalnızca kayıtlı olan e-postaların giriş yapmasına izin ver
+    if (mode === 'login' && !REGISTERED_EMAILS.includes(email.toLowerCase())) {
+      setError(t(language, 'unregisteredEmail'));
+      return;
+    }
+
     setLoading(true);
     // Simulate auth delay
     await new Promise((r) => setTimeout(r, 1200));
@@ -29,13 +46,14 @@ export default function AuthScreen() {
   };
 
   return (
-    <div className="min-h-dvh flex items-center justify-center px-4 relative">
+    <div className="absolute inset-0 overflow-y-auto overflow-x-hidden">
       {/* Background orbs */}
       <div className="orb orb-purple" />
       <div className="orb orb-cyan" />
-      <div className="bg-grid fixed inset-0 z-0 pointer-events-none" />
+      <div className="bg-grid absolute inset-0 z-0 pointer-events-none" />
 
-      <div className="relative z-10 w-full max-w-md animate-fade-in-up">
+      <div className="min-h-full w-full flex items-center justify-center p-4 py-12 relative z-10">
+        <div className="w-full max-w-md animate-fade-in-up mx-auto">
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4 animate-float"
@@ -44,12 +62,12 @@ export default function AuthScreen() {
           </div>
           <h1 className="text-3xl font-bold gradient-text mb-1">TimePerception</h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>
-            Zaman algını bilimsel olarak ölç
+            {t(language, 'authSubtitle')}
           </p>
         </div>
 
         {/* Card */}
-        <div className="glass-card p-7">
+        <div className="glass-card p-8 relative z-20 shadow-2xl">
           {/* Tab toggle */}
           <div className="flex mb-6 p-1 rounded-xl" style={{ background: 'rgba(13,13,20,0.8)' }}>
             {(['login', 'signup'] as Mode[]).map((m) => (
@@ -63,19 +81,20 @@ export default function AuthScreen() {
                   boxShadow: mode === m ? '0 4px 15px rgba(124,58,237,0.3)' : 'none',
                 }}
               >
-                {m === 'login' ? 'Giriş Yap' : 'Kayıt Ol'}
+                {mode === m && m === 'login' ? t(language, 'loginTab') : mode === m && m === 'signup' ? t(language, 'signupTab') : m === 'login' ? t(language, 'loginTab') : t(language, 'signupTab')}
               </button>
             ))}
           </div>
 
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-5 mt-2">
             {mode === 'signup' && (
               <div className="relative">
                 <User size={16} className="absolute left-4 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)' }} />
                 <input
-                  className="input-field pl-11"
+                  className="input-field"
+                  style={{ paddingLeft: '3rem' }}
                   type="text"
-                  placeholder="Adın"
+                  placeholder={t(language, 'namePlaceholder')}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   autoComplete="name"
@@ -85,9 +104,10 @@ export default function AuthScreen() {
             <div className="relative">
               <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)' }} />
               <input
-                className="input-field pl-11"
+                className="input-field"
+                style={{ paddingLeft: '3rem' }}
                 type="email"
-                placeholder="E-posta adresi"
+                placeholder={t(language, 'emailPlaceholder')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 autoComplete="email"
@@ -96,9 +116,10 @@ export default function AuthScreen() {
             <div className="relative">
               <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)' }} />
               <input
-                className="input-field pl-11 pr-11"
+                className="input-field"
+                style={{ paddingLeft: '3rem', paddingRight: '3rem' }}
                 type={showPass ? 'text' : 'password'}
-                placeholder="Şifre"
+                placeholder={t(language, 'passwordPlaceholder')}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
@@ -128,27 +149,26 @@ export default function AuthScreen() {
               {loading ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  <span>Kontrol ediliyor...</span>
+                  <span>{t(language, 'checking')}</span>
                 </>
               ) : (
                 <>
                   <Zap size={16} />
-                  <span>{mode === 'login' ? 'Teste Başla' : 'Hesap Oluştur & Başla'}</span>
+                  <span>{mode === 'login' ? t(language, 'loginBtn') : t(language, 'signupBtn')}</span>
                 </>
               )}
             </button>
           </form>
 
           {/* Info note */}
-          <p className="text-center mt-5 text-xs" style={{ color: 'var(--text-muted)' }}>
-            Verileriniz yalnızca test sonuçlarınızı saklamak için kullanılır.
-            <br />Herhangi bir üçüncü tarafla paylaşılmaz.
+          <p className="text-center mt-5 text-xs whitespace-pre-line" style={{ color: 'var(--text-muted)' }}>
+            {t(language, 'privacyNote')}
           </p>
         </div>
 
         {/* Feature pills */}
         <div className="flex gap-3 mt-6 justify-center flex-wrap">
-          {['Bilimsel formül', 'Kör kronometre testi', 'Kişisel analiz'].map((f) => (
+          {[t(language, 'featureScientific'), t(language, 'featureBlindTest'), t(language, 'featurePersonal')].map((f) => (
             <span
               key={f}
               className="text-xs px-3 py-1.5 rounded-full"
@@ -157,6 +177,7 @@ export default function AuthScreen() {
               {f}
             </span>
           ))}
+        </div>
         </div>
       </div>
     </div>

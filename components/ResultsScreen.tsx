@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react';
 import { useApp } from '@/lib/AppContext';
+import { t, Language } from '@/lib/i18n';
 import {
   ResponsiveContainer,
   BarChart,
@@ -30,7 +31,8 @@ interface Analysis {
 
 function analyzeResults(
   rounds: ReturnType<typeof useApp>['roundResults'],
-  expectedTPR: number
+  expectedTPR: number,
+  language: Language
 ): Analysis {
   if (!rounds.length) {
     return {
@@ -38,8 +40,8 @@ function analyzeResults(
       expectedTPR,
       deltaRatio: 0,
       profileCategory: 'match',
-      headline: 'Sonuç hesaplanamadı.',
-      subtext: 'Lütfen testi tekrarlayın.',
+      headline: t(language, 'resultsCalcError'),
+      subtext: t(language, 'resultsRepeatTest'),
       color: '#7c3aed',
       icon: Brain,
     };
@@ -60,27 +62,21 @@ function analyzeResults(
   let icon: typeof Brain;
 
   if (delta < -0.12) {
-    // Stopped much earlier than expected → time felt much faster than profile predicts
     category = 'underperform';
-    headline = 'Zaman Algın Profilinden de Hızlı Akıyor';
-    subtext =
-      'Odak süren, yaş/uyku/ekran süresi profilindeki birinden beklenenden çok daha az! Zaman senin için olağandışı bir hızda akıyor. Dopamin reseptörlerin yoğun yük altında — bu bir alarm sinyali.';
+    headline = t(language, 'resultsUnderHeadline');
+    subtext = t(language, 'resultsUnderSub');
     color = '#ef4444';
     icon = TrendingDown;
   } else if (delta > 0.12) {
-    // Stopped later than expected → time felt slower (better focus)
     category = 'overperform';
-    headline = 'Zaman Algın Profilinden Daha Sağlıklı';
-    subtext =
-      'Profilindeki biri için beklenen değerin üzerine çıktın. Odak kaliten tahminlerin üzerinde — ancak bu sürdürülebilir mi? Verilerini korumak için düzenli egzersiz ve uyku tutarlılığına dikkat et.';
+    headline = t(language, 'resultsOverHeadline');
+    subtext = t(language, 'resultsOverSub');
     color = '#10b981';
     icon = TrendingUp;
   } else {
-    // Within expected range
     category = 'match';
-    headline = 'Zaman Algın Profilinle Eşleşiyor';
-    subtext =
-      'Sonuçların anket verilerinle tutarlı. İyi haber: bu oran hâlâ optimize edilebilir. Kısa video süresini 30 dakika azaltmak tek başına zaman algı hassasiyetini %8 artırabilir.';
+    headline = t(language, 'resultsMatchHeadline');
+    subtext = t(language, 'resultsMatchSub');
     color = '#f59e0b';
     icon = Minus;
   }
@@ -99,7 +95,7 @@ function analyzeResults(
 
 // ─── Custom Tooltip ────────────────────────────────────────────────────────────
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip = ({ active, payload, language }: any) => {
   if (active && payload && payload.length) {
     const d = payload[0].payload;
     return (
@@ -107,15 +103,15 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         className="px-4 py-3 rounded-xl text-sm"
         style={{ background: '#1a1a2e', border: '1px solid #2e2e55', color: 'var(--text-primary)' }}
       >
-        <p className="font-bold mb-1">Tur {d.round}</p>
+        <p className="font-bold mb-1">{t(language || 'tr', 'resultsTooltipRound', { round: d.round })}</p>
         <p style={{ color: 'var(--text-muted)' }}>
-          Hedef: <strong style={{ color: 'white' }}>{d.target}s</strong>
+          {t(language || 'tr', 'resultsRoundTarget')} <strong style={{ color: 'white' }}>{d.target}s</strong>
         </p>
         <p style={{ color: 'var(--text-muted)' }}>
-          Gerçek: <strong style={{ color: 'white' }}>{d.actual}s</strong>
+          {t(language || 'tr', 'resultsRoundActual')} <strong style={{ color: 'white' }}>{d.actual}s</strong>
         </p>
         <p style={{ color: payload[0].fill }}>
-          Hata: {d.error > 0 ? '+' : ''}{d.error}%
+          {t(language || 'tr', 'resultsTooltipError')} {d.error > 0 ? '+' : ''}{d.error}%
         </p>
       </div>
     );
@@ -126,10 +122,10 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function ResultsScreen() {
-  const { roundResults, expectedTPR, user, resetApp } = useApp();
+  const { roundResults, expectedTPR, user, resetApp, language } = useApp();
 
   const tpr = expectedTPR ?? 1.0;
-  const analysis = useMemo(() => analyzeResults(roundResults, tpr), [roundResults, tpr]);
+  const analysis = useMemo(() => analyzeResults(roundResults, tpr, language), [roundResults, tpr, language]);
 
   const chartData = roundResults.map((r) => ({
     round: r.round,
@@ -146,19 +142,20 @@ export default function ResultsScreen() {
   const Icon = analysis.icon;
 
   return (
-    <div className="min-h-dvh flex flex-col px-4 py-8 relative">
+    <div className="absolute inset-0 overflow-y-auto overflow-x-hidden">
       <div className="orb orb-purple" style={{ opacity: 0.2 }} />
       <div className="orb orb-cyan" style={{ opacity: 0.12 }} />
-      <div className="bg-grid fixed inset-0 z-0 pointer-events-none" />
+      <div className="bg-grid absolute inset-0 z-0 pointer-events-none" />
 
-      <div className="relative z-10 w-full max-w-lg mx-auto flex flex-col gap-6">
+      <div className="min-h-full w-full flex items-center justify-center p-4 py-12 relative z-10">
+        <div className="w-full max-w-lg flex flex-col gap-6 mx-auto">
         {/* Header */}
         <div className="text-center">
           <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
-            {user?.name} için sonuçlar
+            {t(language, 'resultsForUser', { name: user?.name || '' })}
           </p>
           <h1 className="text-2xl font-bold mt-1" style={{ color: 'var(--text-primary)' }}>
-            Zaman Algısı Analizi
+            {t(language, 'resultsTitle')}
           </h1>
         </div>
 
@@ -190,27 +187,27 @@ export default function ResultsScreen() {
         <div className="grid grid-cols-2 gap-3">
           {[
             {
-              label: 'Ortalama Hata',
+              label: t(language, 'resultsAvgError'),
               value: `±${avgError.toFixed(1)}%`,
-              sub: 'Tahmin sapman',
+              sub: t(language, 'resultsAvgErrorSub'),
               color: analysis.color,
             },
             {
-              label: 'Algı Oranı',
+              label: t(language, 'resultsPerceptionRatio'),
               value: `${analysis.actualMeanRatio.toFixed(2)}x`,
-              sub: 'Gerçek / Hedef',
+              sub: t(language, 'resultsPerceptionRatioSub'),
               color: '#7c3aed',
             },
             {
-              label: 'Profil Skoru',
+              label: t(language, 'resultsProfileScore'),
               value: `${(tpr * 100).toFixed(0)}/100`,
-              sub: 'Beklenen oran',
+              sub: t(language, 'resultsProfileScoreSub'),
               color: '#06b6d4',
             },
             {
-              label: 'Test Turları',
+              label: t(language, 'resultsRoundsComplete'),
               value: `${roundResults.length}/5`,
-              sub: 'Tamamlanan',
+              sub: t(language, 'resultsRoundsCompleteSub'),
               color: '#10b981',
             },
           ].map((stat) => (
@@ -242,7 +239,7 @@ export default function ResultsScreen() {
         {/* Performance Chart */}
         <div className="glass-card p-5">
           <h3 className="text-sm font-bold mb-4" style={{ color: 'var(--text-secondary)' }}>
-            5 Tur Performans Grafiği — Hata % (Hedeften Sapma)
+            {t(language, 'resultsChartTitle')}
           </h3>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={chartData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
@@ -256,7 +253,7 @@ export default function ResultsScreen() {
                 tick={{ fill: '#5a5a7a', fontSize: 11 }}
                 tickFormatter={(v) => `${v}%`}
               />
-              <Tooltip content={<CustomTooltip />} />
+              <Tooltip content={<CustomTooltip language={language} />} />
               <ReferenceLine y={0} stroke="#ffffff30" strokeWidth={1} />
               <ReferenceLine
                 y={10}
@@ -281,9 +278,9 @@ export default function ResultsScreen() {
           </ResponsiveContainer>
           <div className="flex gap-4 mt-3 justify-center">
             {[
-              { color: '#10b981', label: 'İyi (≤10%)' },
-              { color: '#f59e0b', label: 'Orta (≤25%)' },
-              { color: '#ef4444', label: 'Yüksek (>25%)' },
+              { color: '#10b981', label: t(language, 'resultsGood') },
+              { color: '#f59e0b', label: t(language, 'resultsMid') },
+              { color: '#ef4444', label: t(language, 'resultsBad') },
             ].map((l) => (
               <div key={l.label} className="flex items-center gap-1.5">
                 <div className="w-2.5 h-2.5 rounded-sm" style={{ background: l.color }} />
@@ -296,7 +293,7 @@ export default function ResultsScreen() {
         {/* Round detail table */}
         <div className="glass-card p-5">
           <h3 className="text-sm font-bold mb-4" style={{ color: 'var(--text-secondary)' }}>
-            Tur Detayları
+            {t(language, 'resultsRoundDetails')}
           </h3>
           <div className="flex flex-col gap-2">
             {roundResults.map((r) => {
@@ -316,12 +313,12 @@ export default function ResultsScreen() {
                       {r.round}
                     </div>
                     <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                      Hedef: <strong style={{ color: 'white' }}>{r.targetSeconds}s</strong>
+                      {t(language, 'resultsRoundTarget')} <strong style={{ color: 'white' }}>{r.targetSeconds}s</strong>
                     </span>
                   </div>
                   <div className="text-right">
                     <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                      Gerçek: <strong style={{ color: 'white' }}>{r.actualSeconds}s</strong>
+                      {t(language, 'resultsRoundActual')} <strong style={{ color: 'white' }}>{r.actualSeconds}s</strong>
                     </span>
                     <span className="ml-3 text-xs font-semibold" style={{ color }}>
                       {r.errorPercent > 0 ? '+' : ''}{r.errorPercent}%
@@ -333,7 +330,6 @@ export default function ResultsScreen() {
           </div>
         </div>
 
-        {/* Science note */}
         <div
           className="p-4 rounded-xl text-sm leading-relaxed"
           style={{
@@ -342,17 +338,15 @@ export default function ResultsScreen() {
             color: 'var(--text-secondary)',
           }}
         >
-          <strong style={{ color: '#a855f7' }}>Nasıl yorumlamalısın?</strong>
+          <strong style={{ color: '#a855f7' }}>{t(language, 'resultsScienceTitle')}</strong>
           <br />
-          Pozitif hata (%) → Hedeften geç durdurdun → Zaman sana yavaş geçti.
+          {t(language, 'resultsScienceP1')}
           <br />
-          Negatif hata (%) → Hedeften erken durdurdun → Zaman sana hızlı geçti.
+          {t(language, 'resultsScienceP2')}
           <br />
-          Ekran süresi ve kısa video tüketimi yüksek bireyler sistematik olarak erken durduruyor
-          (Montag et al., 2021).
+          {t(language, 'resultsScienceP3')}
         </div>
 
-        {/* CTA */}
         <div
           className="p-6 rounded-2xl text-center"
           style={{
@@ -360,17 +354,16 @@ export default function ResultsScreen() {
             border: '1px solid rgba(124,58,237,0.3)',
           }}
         >
-          <h3 className="text-lg font-bold mb-2 gradient-text">Odağını Geri Kazan</h3>
+          <h3 className="text-lg font-bold mb-2 gradient-text">{t(language, 'resultsCtaTitle')}</h3>
           <p className="text-sm mb-5" style={{ color: 'var(--text-secondary)' }}>
-            Sana özel Pomodoro programı, ekran süresi planı ve nörobilişsel egzersizler
-            uygulamada seni bekliyor.
+            {t(language, 'resultsCtaSub')}
           </p>
           <button
             className="btn-primary w-full flex items-center justify-center gap-2 text-base py-4 mb-3"
-            onClick={() => alert('Uygulama yakında! 🚀')}
+            onClick={() => alert(t(language, 'appComingSoon'))}
           >
             <Zap size={18} />
-            Sana Özel Pomodoro Programını Almak İçin Uygulamaya Geç
+            {t(language, 'resultsCtaBtn')}
             <ExternalLink size={14} />
           </button>
           <button
@@ -378,9 +371,10 @@ export default function ResultsScreen() {
             className="btn-outline w-full flex items-center justify-center gap-2"
           >
             <RotateCcw size={15} />
-            Testi Yeniden Yap
+            {t(language, 'resultsRestartBtn')}
           </button>
         </div>
+      </div>
       </div>
     </div>
   );

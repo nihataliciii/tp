@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 import { questions, Question } from '@/lib/questionsData';
+import { Language } from '@/lib/i18n';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -32,9 +33,11 @@ interface AppState {
   expectedTPR: number | null; // Time Perception Ratio (NEVER displayed)
   roundResults: RoundResult[];
   currentRound: number;
+  language: Language;
 }
 
 interface AppContextValue extends AppState {
+  setLanguage: (lang: Language) => void;
   setStage: (stage: AppStage) => void;
   setUser: (user: { name: string; email: string }) => void;
   submitAnswer: (answer: Answer) => void;
@@ -84,12 +87,17 @@ const initialState: AppState = {
   expectedTPR: null,
   roundResults: [],
   currentRound: 0,
+  language: 'tr',
 };
 
 const AppContext = createContext<AppContextValue | null>(null);
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AppState>(initialState);
+
+  const setLanguage = useCallback((lang: Language) => {
+    setState((prev) => ({ ...prev, language: lang }));
+  }, []);
 
   const setStage = useCallback((stage: AppStage) => {
     setState((prev) => ({ ...prev, stage }));
@@ -134,6 +142,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     <AppContext.Provider
       value={{
         ...state,
+        setLanguage,
         setStage,
         setUser,
         submitAnswer,
