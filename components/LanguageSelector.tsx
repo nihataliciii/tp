@@ -32,7 +32,7 @@ export default function LanguageSelector() {
   const currentLang = languages.find(l => l.code === language) || languages[0];
 
   return (
-    <div className="absolute top-6 right-6 z-50 animate-fade-in-up" ref={dropdownRef}>
+    <div className="relative z-50 animate-fade-in-up" ref={dropdownRef}>
       <button 
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 px-3 py-2 rounded-xl glass-card text-sm font-medium transition-all hover:bg-[rgba(26,26,46,0.9)]"

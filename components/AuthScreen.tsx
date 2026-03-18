@@ -54,12 +54,8 @@ export default function AuthScreen() {
 
       <div className="min-h-full w-full flex items-center justify-center p-4 py-12 relative z-10">
         <div className="w-full max-w-md animate-fade-in-up mx-auto">
-        {/* Logo */}
+        {/* Title & Subtitle */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4 animate-float"
-               style={{ background: 'linear-gradient(135deg, #7c3aed, #06b6d4)', boxShadow: '0 0 40px rgba(124,58,237,0.5)' }}>
-            <Brain size={30} color="white" />
-          </div>
           <h1 className="text-3xl font-bold gradient-text mb-1">TimePerception</h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>
             {t(language, 'authSubtitle')}
