@@ -94,14 +94,8 @@ export default function ChronometerScreen() {
   };
 
   return (
-    <div className="absolute inset-0 overflow-y-auto overflow-x-hidden">
-      <div className="orb orb-purple" style={{ opacity: 0.15 }} />
-      <div className="orb orb-cyan" style={{ opacity: 0.1 }} />
-      <div className="bg-grid absolute inset-0 z-0 pointer-events-none" />
-
-      <div className="min-h-full w-full flex items-center justify-center p-4 py-12 relative z-10">
-        <div className="w-full max-w-md mx-auto">
-        {/* Header */}
+    <div className="w-full max-w-md mx-auto relative z-10">
+      {/* Header */}
         {!isFinished && (
           <div className="text-center mb-6">
             <p className="text-xs font-medium mb-1" style={{ color: 'var(--text-muted)' }}>
@@ -279,8 +273,6 @@ export default function ChronometerScreen() {
             {t(language, 'warningScreen')}
           </p>
         )}
-      </div>
-      </div>
     </div>
   );
 }

@@ -3,7 +3,7 @@
 import { useParams, useRouter } from 'next/navigation';
 import { useBlogStore } from '@/lib/useBlogStore';
 import { useApp } from '@/lib/AppContext';
-import { ChevronLeft, Calendar } from 'lucide-react';
+import { ChevronLeft, Calendar, FileText } from 'lucide-react';
 
 export default function BlogPostDetail() {
   const params = useParams();
@@ -71,6 +71,21 @@ export default function BlogPostDetail() {
       {/* Content Section */}
       <div className="max-w-3xl mx-auto px-6 py-12 md:py-20 relative z-20 bg-[#0a0a0f]">
         <div className="prose prose-invert prose-lg md:prose-xl max-w-none">
+          
+          {post.pdfUrl && (
+            <div className="mb-10 animate-fade-in-up">
+              <a 
+                href={post.pdfUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-3 bg-[rgba(124,58,237,0.15)] border border-[var(--accent-purple)] text-[var(--accent-purple-light)] hover:bg-[var(--accent-purple)] hover:text-white px-6 py-4 rounded-xl font-bold transition-all duration-300 shadow-[0_0_20px_rgba(124,58,237,0.2)] hover:shadow-[0_0_30px_rgba(124,58,237,0.5)] transform hover:-translate-y-1"
+              >
+                <FileText size={24} /> 
+                PDF Dökümanını Görüntüle / İndir
+              </a>
+            </div>
+          )}
+
           <p className="text-xl md:text-2xl text-[var(--accent-cyan-light)] font-medium mb-10 leading-relaxed">
             {post.summary}
           </p>

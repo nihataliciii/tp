@@ -1,7 +1,8 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useEffect, useRef } from 'react';
 import { useApp } from '@/lib/AppContext';
+import { useAuthStore } from '@/lib/useAuthStore';
 import { t, Language } from '@/lib/i18n';
 import {
   ResponsiveContainer,
@@ -123,9 +124,27 @@ const CustomTooltip = ({ active, payload, language }: any) => {
 
 export default function ResultsScreen() {
   const { roundResults, expectedTPR, user, resetApp, language } = useApp();
+  const { currentUser, addTestResult } = useAuthStore();
 
   const tpr = expectedTPR ?? 1.0;
   const analysis = useMemo(() => analyzeResults(roundResults, tpr, language), [roundResults, tpr, language]);
+
+  const savedRef = useRef(false);
+  
+  useEffect(() => {
+    if (currentUser && roundResults.length > 0 && !savedRef.current) {
+      savedRef.current = true;
+      const statusStr = analysis.profileCategory === 'overperform' ? 'Yavaş Algı' 
+                      : analysis.profileCategory === 'underperform' ? 'Hızlı Algı' : 'Normal Algı';
+                      
+      addTestResult(currentUser.id, {
+        date: new Date().toISOString(),
+        testType: 'Zaman Algısı Testi',
+        scoreStr: `${analysis.actualMeanRatio.toFixed(2)}x Oran | ${(tpr * 100).toFixed(0)} Skor`,
+        status: statusStr
+      });
+    }
+  }, [currentUser, roundResults, analysis, tpr, addTestResult]);
 
   const chartData = roundResults.map((r) => ({
     round: r.round,
@@ -142,14 +161,8 @@ export default function ResultsScreen() {
   const Icon = analysis.icon;
 
   return (
-    <div className="absolute inset-0 overflow-y-auto overflow-x-hidden">
-      <div className="orb orb-purple" style={{ opacity: 0.2 }} />
-      <div className="orb orb-cyan" style={{ opacity: 0.12 }} />
-      <div className="bg-grid absolute inset-0 z-0 pointer-events-none" />
-
-      <div className="min-h-full w-full flex items-center justify-center p-4 py-12 relative z-10">
-        <div className="w-full max-w-lg flex flex-col gap-6 mx-auto">
-        {/* Header */}
+    <div className="w-full max-w-lg flex flex-col gap-6 mx-auto relative z-10">
+      {/* Header */}
         <div className="text-center">
           <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
             {t(language, 'resultsForUser', { name: user?.name || '' })}
@@ -374,8 +387,6 @@ export default function ResultsScreen() {
             {t(language, 'resultsRestartBtn')}
           </button>
         </div>
-      </div>
-      </div>
     </div>
   );
 }

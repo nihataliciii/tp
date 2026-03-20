@@ -116,7 +116,20 @@ export const translations = {
     feature3Desc: 'Size özel ölçümlerle üretkenliğinizi ve odak sürenizi maksimize edin.',
     aboutUs: 'Hakkımızda',
     testsNav: 'Testler',
-    loginNav: 'Giriş / Kayıt'
+    loginNav: 'Giriş / Kayıt',
+    emailTaken: 'Bu e-posta adresi zaten kullanımda.',
+    fullNamePlaceholder: 'İsim Soyisim',
+    usernamePlaceholder: 'Kullanıcı Adı',
+    emailOrUserPlaceholder: 'E-posta veya Kullanıcı Adı',
+    forgotPassword: 'Şifremi Unuttum?',
+    resetPassTitle: 'Şifre Sıfırlama',
+    resetPassBtn: 'Bağlantı Gönder',
+    resetPassSuccess: 'Şifre sıfırlama bağlantısı e-posta adresinize gönderildi!',
+    backToLogin: 'Giriş ekranına dön',
+    userNotFound: 'Kullanıcı bulunamadı.',
+    wrongPassword: 'Hatalı şifre girdiniz.',
+    logoutNav: 'Çıkış Yap',
+    logoutSuccess: 'Başarıyla çıkış yapıldı.'
   },
   en: {
     loginTab: 'Log In',
@@ -233,7 +246,20 @@ export const translations = {
     feature3Desc: 'Maximize your productivity and focus span with personalized metrics.',
     aboutUs: 'About Us',
     testsNav: 'Tests',
-    loginNav: 'Login / Sign Up'
+    loginNav: 'Login / Sign Up',
+    emailTaken: 'This email is already in use.',
+    fullNamePlaceholder: 'Full Name',
+    usernamePlaceholder: 'Username',
+    emailOrUserPlaceholder: 'Email or Username',
+    forgotPassword: 'Forgot Password?',
+    resetPassTitle: 'Reset Password',
+    resetPassBtn: 'Send Link',
+    resetPassSuccess: 'Password reset link has been sent to your email!',
+    backToLogin: 'Back to login',
+    userNotFound: 'User not found.',
+    wrongPassword: 'Incorrect password entered.',
+    logoutNav: 'Logout',
+    logoutSuccess: 'Successfully logged out.'
   },
   fr: {
     loginTab: 'Connexion',
@@ -350,7 +376,20 @@ export const translations = {
     feature3Desc: 'Maximisez votre productivité avec des mesures personnalisées.',
     aboutUs: 'À propos de nous',
     testsNav: 'Tests',
-    loginNav: 'Connexion / Inscription'
+    loginNav: 'Connexion / Inscription',
+    emailTaken: 'Cet e-mail est déjà utilisé.',
+    fullNamePlaceholder: 'Nom complet',
+    usernamePlaceholder: 'Nom d\'utilisateur',
+    emailOrUserPlaceholder: 'E-mail ou nom d\'utilisateur',
+    forgotPassword: 'Mot de passe oublié ?',
+    resetPassTitle: 'Réinitialiser le mot de passe',
+    resetPassBtn: 'Envoyer le lien',
+    resetPassSuccess: 'Le lien de réinitialisation a été envoyé à votre e-mail !',
+    backToLogin: 'Retour à la connexion',
+    userNotFound: 'Utilisateur non trouvé.',
+    wrongPassword: 'Mot de passe incorrect.',
+    logoutNav: 'Se Déconnecter',
+    logoutSuccess: 'Déconnexion réussie.'
   },
   de: {
     loginTab: 'Anmelden',
@@ -467,7 +506,20 @@ export const translations = {
     feature3Desc: 'Maximieren Sie Ihre Produktivität und Fokusdauer mit personalisierten Metriken.',
     aboutUs: 'Über uns',
     testsNav: 'Tests',
-    loginNav: 'Anmelden / Registrieren'
+    loginNav: 'Anmelden / Registrieren',
+    emailTaken: 'Diese E-Mail wird bereits verwendet.',
+    fullNamePlaceholder: 'Vollständiger Name',
+    usernamePlaceholder: 'Benutzername',
+    emailOrUserPlaceholder: 'E-Mail oder Benutzername',
+    forgotPassword: 'Passwort vergessen?',
+    resetPassTitle: 'Passwort zurücksetzen',
+    resetPassBtn: 'Link senden',
+    resetPassSuccess: 'Der Link zum Zurücksetzen wurde an Ihre E-Mail gesendet!',
+    backToLogin: 'Zurück zur Anmeldung',
+    userNotFound: 'Benutzer nicht gefunden.',
+    wrongPassword: 'Falsches Passwort eingegeben.',
+    logoutNav: 'Abmelden',
+    logoutSuccess: 'Erfolgreich abgemeldet.'
   },
   zh: {
     loginTab: '登录',
@@ -584,7 +636,20 @@ export const translations = {
     feature3Desc: '通过个性化指标最大限度地提高您的生产力和专注时间。',
     aboutUs: '关于我们',
     testsNav: '测试',
-    loginNav: '登录 / 注册'
+    loginNav: '登录 / 注册',
+    emailTaken: '该电子邮件已被使用。',
+    fullNamePlaceholder: '全名',
+    usernamePlaceholder: '用户名',
+    emailOrUserPlaceholder: '电子邮件或用户名',
+    forgotPassword: '忘记密码？',
+    resetPassTitle: '重置密码',
+    resetPassBtn: '发送链接',
+    resetPassSuccess: '密码重置链接已发送到您的邮箱！',
+    backToLogin: '返回登录',
+    userNotFound: '未找到用户。',
+    wrongPassword: '密码输入错误。',
+    logoutNav: '登出',
+    logoutSuccess: '已成功登出。'
   },
   ru: {
     loginTab: 'Вход',
@@ -701,7 +766,20 @@ export const translations = {
     feature3Desc: 'Максимизируйте свою продуктивность и концентрацию с персональными метриками.',
     aboutUs: 'О нас',
     testsNav: 'Тесты',
-    loginNav: 'Вход / Регистрация'
+    loginNav: 'Вход / Регистрация',
+    emailTaken: 'Этот адрес эл. почты уже используется.',
+    fullNamePlaceholder: 'Полное имя',
+    usernamePlaceholder: 'Имя пользователя',
+    emailOrUserPlaceholder: 'Эл. почта или имя пользователя',
+    forgotPassword: 'Забыли пароль?',
+    resetPassTitle: 'Сброс пароля',
+    resetPassBtn: 'Отправить ссылку',
+    resetPassSuccess: 'Ссылка для сброса пароля отправлена на вашу электронную почту!',
+    backToLogin: 'Вернуться к входу',
+    userNotFound: 'Пользователь не найден.',
+    wrongPassword: 'Введен неверный пароль.',
+    logoutNav: 'Выйти',
+    logoutSuccess: 'Успешный выход из системы.'
   }
 };
 

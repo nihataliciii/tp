@@ -11,7 +11,7 @@ export default function BlogList() {
   const { language } = useApp();
 
   return (
-    <div className="relative min-h-[calc(100vh-64px)] w-full overflow-hidden">
+    <div className="relative min-h-[calc(100vh-64px)] w-full overflow-x-hidden">
       {/* Background orbs */}
       <div className="orb orb-purple" style={{ top: '-10%', left: '-10%', width: '60vw', height: '60vw', filter: 'blur(150px)' }} />
       <div className="orb orb-cyan" style={{ bottom: '-10%', right: '-10%', width: '50vw', height: '50vw', filter: 'blur(140px)' }} />

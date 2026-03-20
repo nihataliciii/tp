@@ -2,17 +2,35 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { Menu, X } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+import { Menu, X, LogOut, CheckCircle2 } from 'lucide-react';
 import { useApp } from '@/lib/AppContext';
+import { useAuthStore } from '@/lib/useAuthStore';
 import { t } from '@/lib/i18n';
 import Logo from './Logo';
 import LanguageSelector from './LanguageSelector';
 
 export default function Navbar() {
   const { language } = useApp();
+  const { currentUser, logout } = useAuthStore();
   const pathname = usePathname();
+  const router = useRouter();
+  const [isOpen, setIsOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+  
+  const handleLogout = () => {
+    logout();
+    setMobileMenuOpen(false);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000);
+    router.push('/');
+  };
 
   type NavItem = { key: string; href: string; highlight?: boolean };
   const navItems: NavItem[] = [
@@ -20,8 +38,13 @@ export default function Navbar() {
     { key: 'navTest', href: '/test', highlight: true },
     { key: 'navBlog', href: '/blog' },
     { key: 'navPomodoro', href: '/pomodoro' },
-    { key: 'navAccount', href: '/account' },
+    (mounted && currentUser) 
+      ? { key: 'navAccount', href: '/account' }
+      : { key: 'loginTab', href: '/login' },
     { key: 'navContact', href: '/contact' },
+    ...((mounted && currentUser?.email.toLowerCase() === 'admin@admin.com') 
+      ? [{ key: 'adminPanel', href: '/admin/blog' }] 
+      : []),
   ];
 
   const handleLinkClick = () => {
@@ -56,6 +79,10 @@ export default function Navbar() {
                     } ${item.highlight ? 'text-[var(--accent-cyan)] hover:text-[var(--accent-cyan-light)] shadow-none glow-text' : ''}`}
                   >
                     {t(language, item.key as any)}
+                    {item.key === 'navAccount' && currentUser?.avatarUrl && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={currentUser.avatarUrl} alt="Avatar" className="ml-2 w-7 h-7 rounded-full inline-block object-cover align-middle border border-[var(--accent-purple-light)]" />
+                    )}
                     {/* Active indicator */}
                     {isExactActive && (
                       <span className="absolute -bottom-2 md:-bottom-[1.35rem] left-0 right-0 border-b-2 border-[var(--accent-purple-light)] glow-border" />
@@ -65,7 +92,17 @@ export default function Navbar() {
               })}
             </div>
             
-            <div className="pl-4 border-l border-[var(--border-accent)]">
+            {(mounted && currentUser) && (
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 text-[var(--accent-purple-light)] hover:text-white transition-colors text-sm font-semibold ml-2 border border-[var(--border-accent)] px-3 py-1.5 rounded-lg hover:bg-[rgba(124,58,237,0.1)]"
+              >
+                <LogOut size={16} />
+                {t(language, 'logoutNav' as any)}
+              </button>
+            )}
+
+            <div className="pl-4 border-l border-[var(--border-accent)] ml-4">
               <LanguageSelector />
             </div>
           </div>
@@ -106,11 +143,34 @@ export default function Navbar() {
                 } ${item.highlight && !isExactActive ? 'text-[var(--accent-cyan)]' : ''}`}
               >
                 {t(language, item.key as any)}
+                {item.key === 'navAccount' && currentUser?.avatarUrl && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={currentUser.avatarUrl} alt="Avatar" className="ml-2 w-6 h-6 rounded-full inline-block object-cover border border-[var(--accent-cyan)]" />
+                )}
               </Link>
             );
           })}
+          {(mounted && currentUser) && (
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 px-3 py-3 w-full text-left rounded-lg text-base font-medium text-red-400 hover:bg-red-500/10 transition-colors mt-2"
+            >
+              <LogOut size={20} />
+              {t(language, 'logoutNav' as any)}
+            </button>
+          )}
         </div>
       </div>
+      
+      {/* Toast Notification */}
+      {showToast && (
+        <div className="fixed top-20 right-4 z-[200] animate-fade-in-up">
+          <div className="bg-[#0a0a0f]/95 backdrop-blur-md border border-[var(--accent-cyan)]/50 text-white px-5 py-3 rounded-xl shadow-[0_0_20px_rgba(0,255,255,0.2)] flex items-center gap-3">
+            <CheckCircle2 className="text-[var(--accent-cyan)]" size={20} />
+            <span className="font-medium text-sm">{t(language, 'logoutSuccess' as any)}</span>
+          </div>
+        </div>
+      )}
       
       {/* Dynamic styles for glowing texts and borders */}
       <style dangerouslySetInnerHTML={{__html: `

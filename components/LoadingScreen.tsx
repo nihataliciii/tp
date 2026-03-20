@@ -55,15 +55,8 @@ export default function LoadingScreen() {
   const Icon = msg.icon;
 
   return (
-    <div
-      className="absolute inset-0 overflow-y-auto overflow-x-hidden"
-      style={{ background: 'radial-gradient(ellipse at center, #0a0a16 0%, #050508 100%)' }}
-    >
-      <div className="orb orb-purple" style={{ opacity: 0.2 }} />
-
-      <div className="min-h-full w-full flex items-center justify-center p-4 py-12 relative z-10">
-        <div className="text-center w-full max-w-sm animate-fade-in-up mx-auto">
-        {/* Central orb spinner */}
+    <div className="text-center w-full max-w-sm animate-fade-in-up mx-auto relative z-10">
+      {/* Central orb spinner */}
         <div className="relative mx-auto mb-10 w-28 h-28">
           {/* Outer ring */}
           <div
@@ -142,8 +135,6 @@ export default function LoadingScreen() {
             </div>
           ))}
         </div>
-      </div>
-      </div>
     </div>
   );
 }

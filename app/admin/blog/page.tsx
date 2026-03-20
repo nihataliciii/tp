@@ -1,13 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useApp } from '@/lib/AppContext';
 import { useBlogStore } from '@/lib/useBlogStore';
+import { useAuthStore } from '@/lib/useAuthStore';
 import { t } from '@/lib/i18n';
 import { FileEdit, Trash2, PlusCircle, Save } from 'lucide-react';
 
 export default function AdminBlogPage() {
-  const { user, language } = useApp();
+  const router = useRouter();
+  const { language } = useApp();
+  const { currentUser } = useAuthStore();
   const { posts, addPost, deletePost, isLoaded } = useBlogStore();
   
   const [formData, setFormData] = useState({
@@ -15,19 +19,19 @@ export default function AdminBlogPage() {
     summary: '',
     content: '',
     imageUrl: '',
+    pdfUrl: '',
     category: ''
   });
 
-  // Authorization Check
-  if (!user || user.email !== 'admin@admin.com') {
-    return (
-      <div className="flex justify-center items-center min-h-[calc(100vh-64px)] w-full bg-[#0a0a0f]">
-        <div className="glass-card p-10 text-center max-w-md">
-          <h1 className="text-2xl font-bold text-red-500 mb-4">{t(language, 'unauthorized')}</h1>
-          <p className="text-[var(--text-secondary)]">Sadece sistem yöneticisi bu sayfaya erişebilir.</p>
-        </div>
-      </div>
-    );
+  // Authorization Check & Redirect
+  useEffect(() => {
+    if (!currentUser || currentUser.email.toLowerCase() !== 'admin@admin.com') {
+      router.push('/login');
+    }
+  }, [currentUser, router]);
+
+  if (!currentUser || currentUser.email.toLowerCase() !== 'admin@admin.com') {
+    return null; // Return empty while redirecting
   }
 
   if (!isLoaded) return null;
@@ -41,10 +45,11 @@ export default function AdminBlogPage() {
       summary: formData.summary,
       content: formData.content,
       imageUrl: formData.imageUrl || 'https://images.unsplash.com/photo-1550592704-6c7b94b053dd?auto=format&fit=crop&q=80',
+      pdfUrl: formData.pdfUrl || undefined,
       category: formData.category || 'Genel'
     });
 
-    setFormData({ title: '', summary: '', content: '', imageUrl: '', category: '' });
+    setFormData({ title: '', summary: '', content: '', imageUrl: '', pdfUrl: '', category: '' });
   };
 
   return (
@@ -91,6 +96,12 @@ export default function AdminBlogPage() {
                 placeholder={t(language, 'imageUrl')}
                 value={formData.imageUrl}
                 onChange={e => setFormData({...formData, imageUrl: e.target.value})}
+              />
+              <input
+                className="input-field border-[var(--accent-purple)]/30"
+                placeholder="PDF Linki (Opsiyonel)"
+                value={formData.pdfUrl}
+                onChange={e => setFormData({...formData, pdfUrl: e.target.value})}
               />
               <textarea
                 className="input-field min-h-[200px] resize-y"

@@ -84,14 +84,8 @@ export default function SurveyScreen() {
   const maxText = surveyLabels.maxLabel[language] || 'Max';
 
   return (
-    <div className="absolute inset-0 overflow-y-auto overflow-x-hidden">
-      <div className="orb orb-purple" />
-      <div className="orb orb-cyan" />
-      <div className="bg-grid absolute inset-0 z-0 pointer-events-none" />
-
-      <div className="min-h-full w-full flex items-center justify-center p-4 py-12 relative z-10">
-        <div className="w-full max-w-lg flex flex-col gap-6 mx-auto">
-        {/* Header */}
+    <div className="w-full max-w-lg flex flex-col gap-6 mx-auto relative z-10 shrink-0">
+      {/* Header */}
         <div>
           <div className="flex justify-between items-center mb-1">
             <span className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>
@@ -114,7 +108,7 @@ export default function SurveyScreen() {
         </div>
 
         {/* Question Card */}
-        <div className="glass-card p-6 flex-1">
+        <div className="glass-card p-6 flex-1 shrink-0 overflow-visible">
           <h2 className="text-xl font-bold mb-2 leading-snug" style={{ color: 'var(--text-primary)' }}>
             {q.question}
           </h2>
@@ -227,8 +221,6 @@ export default function SurveyScreen() {
             <ChevronRight size={16} />
           </button>
         </div>
-      </div>
-      </div>
     </div>
   );
 }

@@ -8,6 +8,7 @@ export interface BlogPost {
   summary: string;
   content: string;
   imageUrl: string;
+  pdfUrl?: string; // Opsiyonel PDF belgesi URL'i
   category: string;
   date: string;
 }
