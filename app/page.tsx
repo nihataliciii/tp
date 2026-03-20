@@ -29,18 +29,5 @@ function AppRouter() {
 }
 
 export default function Home() {
-  return (
-    <AppProvider>
-      <header className="absolute top-0 left-0 right-0 z-50 flex justify-between items-center p-4 md:p-6 pointer-events-none">
-        <div className="flex-1" />
-        <div className="flex-shrink-0 pointer-events-auto">
-          <Logo />
-        </div>
-        <div className="flex-1 flex justify-end pointer-events-auto">
-          <LanguageSelector />
-        </div>
-      </header>
-      <AppRouter />
-    </AppProvider>
-  );
+  return <AppRouter />;
 }

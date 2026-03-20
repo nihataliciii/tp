@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { AppProvider } from '@/lib/AppContext';
+import Navbar from '@/components/Navbar';
 
 export const metadata: Metadata = {
   title: 'TimePerception — Zaman Algını Ölç',
@@ -25,7 +27,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
         />
       </head>
-      <body>{children}</body>
+      <body>
+        <AppProvider>
+          <Navbar />
+          <main className="pt-16 min-h-screen flex flex-col">
+            {children}
+          </main>
+        </AppProvider>
+      </body>
     </html>
   );
 }
