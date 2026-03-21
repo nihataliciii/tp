@@ -18,8 +18,8 @@ export default function TestPage() {
   }, [stage, setStage]);
 
   return (
-    <div className="min-h-[calc(100vh-64px)] w-full flex justify-center items-center py-10 px-4">
-      <div className="w-full max-w-7xl flex flex-col justify-center items-center animate-fade-in-up">
+    <div className="min-h-[calc(100vh-64px)] w-full flex justify-center items-start pt-12 pb-24 px-4 overflow-y-auto">
+      <div className="w-full max-w-7xl flex flex-col justify-center items-center animate-fade-in-up mt-8">
         {stage === 'survey' && <SurveyScreen />}
         {stage === 'loading' && <LoadingScreen />}
         {stage === 'test' && <ChronometerScreen />}
