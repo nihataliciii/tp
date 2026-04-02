@@ -55,7 +55,8 @@ export default function LoadingScreen() {
   const Icon = msg.icon;
 
   return (
-    <div className="text-center w-full max-w-sm animate-fade-in-up mx-auto relative z-10">
+    <div className="w-full flex flex-col items-center justify-center min-h-[60vh] px-4 relative z-10">
+      <div className="w-full max-w-sm flex flex-col items-center animate-fade-in-up mx-auto">
       {/* Central orb spinner */}
         <div className="relative mx-auto mb-10 w-28 h-28">
           {/* Outer ring */}
@@ -135,6 +136,7 @@ export default function LoadingScreen() {
             </div>
           ))}
         </div>
+      </div>
     </div>
   );
 }

@@ -3,19 +3,19 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Menu, X, LogOut, CheckCircle2 } from 'lucide-react';
+import { Menu, X, LogOut, CheckCircle2, Timer } from 'lucide-react';
 import { useApp } from '@/lib/AppContext';
 import { useAuthStore } from '@/lib/useAuthStore';
 import { t } from '@/lib/i18n';
-import Logo from './Logo';
 import LanguageSelector from './LanguageSelector';
+import ThemeToggle from './ThemeToggle';
+
 
 export default function Navbar() {
   const { language } = useApp();
   const { currentUser, logout } = useAuthStore();
   const pathname = usePathname();
   const router = useRouter();
-  const [isOpen, setIsOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -42,6 +42,7 @@ export default function Navbar() {
       ? { key: 'navAccount', href: '/account' }
       : { key: 'loginTab', href: '/login' },
     { key: 'navContact', href: '/contact' },
+    { key: 'navForum', href: '/forum' },
     ...((mounted && currentUser?.email.toLowerCase() === 'admin@admin.com') 
       ? [{ key: 'adminPanel', href: '/admin/blog' }] 
       : []),
@@ -54,65 +55,68 @@ export default function Navbar() {
   return (
     <nav className="fixed top-0 left-0 right-0 z-[100] border-b border-[var(--border-accent)] bg-black/60 backdrop-blur-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Left section: Logo and Brand Name */}
-          <Link href="/" className="flex items-center gap-3 shrink-0" onClick={handleLinkClick}>
-            <Logo className="w-9 h-9" />
-            <span className="text-xl font-semibold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent-purple-light)] to-[var(--accent-cyan)] font-space">
+        <div className="flex items-center h-16 gap-4">
+          {/* Left: Logo */}
+          <Link href="/" className="flex items-center gap-3 shrink-0 mr-4" onClick={handleLinkClick}>
+            {/* Logo Placeholder */}
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[var(--accent-purple)] to-[var(--accent-cyan)] flex items-center justify-center shadow-[0_0_12px_var(--glow-purple)]">
+              <Timer size={18} className="text-white" />
+            </div>
+            <span className="text-xl font-bold tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent-purple-light)] to-[var(--accent-cyan)] uppercase" style={{ fontFamily: "'Formula1', 'Inter', sans-serif", letterSpacing: '0.08em' }}>
               TimePerception
             </span>
           </Link>
 
-          {/* Right section: Links & Language for desktop */}
-          <div className="hidden lg:flex items-center gap-6 xl:gap-8">
-            <div className="flex items-center gap-6 xl:gap-8 mr-4">
-              {navItems.map((item) => {
-                const isActive = pathname === item.href || (item.href === '/' && pathname === '/test'); // Handling basic root if needed
-                const isExactActive = pathname === item.href;
-                
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={`relative font-medium transition-colors hover:text-white ${
-                      isExactActive ? 'text-white' : 'text-[var(--text-secondary)]'
-                    } ${item.highlight ? 'text-[var(--accent-cyan)] hover:text-[var(--accent-cyan-light)] shadow-none glow-text' : ''}`}
-                  >
-                    {t(language, item.key as any)}
-                    {item.key === 'navAccount' && currentUser?.avatarUrl && (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={currentUser.avatarUrl} alt="Avatar" className="ml-2 w-7 h-7 rounded-full inline-block object-cover align-middle border border-[var(--accent-purple-light)]" />
-                    )}
-                    {/* Active indicator */}
-                    {isExactActive && (
-                      <span className="absolute -bottom-2 md:-bottom-[1.35rem] left-0 right-0 border-b-2 border-[var(--accent-purple-light)] glow-border" />
-                    )}
-                  </Link>
-                );
-              })}
-            </div>
-            
+          {/* Center: Nav Links (desktop) */}
+          <div className="hidden lg:flex flex-1 items-center justify-center gap-0.5 overflow-hidden">
+            {navItems.map((item) => {
+              const isExactActive = pathname === item.href;
+              
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`relative font-semibold transition-all px-2.5 py-2.5 rounded-lg hover:bg-white/5 text-xs whitespace-nowrap ${
+                    isExactActive ? 'text-white bg-white/5' : 'text-[var(--text-secondary)] hover:text-white'
+                  } ${item.highlight ? 'text-[var(--accent-cyan)] hover:text-[var(--accent-cyan-light)]' : ''}`}
+                  style={{ letterSpacing: '0.02em' }}
+                >
+                  {t(language, item.key as any)}
+                  {item.key === 'navAccount' && currentUser?.avatarUrl && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={currentUser.avatarUrl} alt="Avatar" className="ml-1 w-5 h-5 rounded-full inline-block object-cover align-middle border border-[var(--accent-purple-light)]" />
+                  )}
+                  {isExactActive && (
+                    <span className="absolute bottom-0 left-2 right-2 h-0.5 bg-gradient-to-r from-[var(--accent-purple-light)] to-[var(--accent-cyan)] rounded-full" />
+                  )}
+                </Link>
+              );
+            })}
+          </div>
+
+          {/* Right: Actions */}
+          <div className="hidden lg:flex items-center gap-3 ml-auto shrink-0">
+            <ThemeToggle />
             {(mounted && currentUser) && (
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-2 text-[var(--accent-purple-light)] hover:text-white transition-colors text-sm font-semibold ml-2 border border-[var(--border-accent)] px-3 py-1.5 rounded-lg hover:bg-[rgba(124,58,237,0.1)]"
+                className="flex items-center gap-2 text-[var(--accent-purple-light)] hover:text-white transition-colors text-sm font-semibold border border-[var(--border-accent)] px-4 py-2.5 rounded-lg hover:bg-[rgba(124,58,237,0.1)] min-h-[44px]"
               >
                 <LogOut size={16} />
                 {t(language, 'logoutNav' as any)}
               </button>
             )}
-
-            <div className="pl-4 border-l border-[var(--border-accent)] ml-4">
+            <div className="pl-3 border-l border-[var(--border-accent)]">
               <LanguageSelector />
             </div>
           </div>
 
           {/* Mobile menu button */}
-          <div className="flex items-center gap-4 lg:hidden">
+          <div className="flex items-center gap-4 lg:hidden ml-auto">
             <LanguageSelector />
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="text-[var(--text-primary)] hover:text-white transition-colors"
+              className="text-[var(--text-primary)] hover:text-white transition-colors p-2"
               aria-label="Toggle menu"
             >
               {mobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
@@ -124,10 +128,10 @@ export default function Navbar() {
       {/* Mobile Menu Dropdown */}
       <div
         className={`lg:hidden transition-all duration-300 ease-in-out overflow-hidden bg-[rgba(15,15,26,0.95)] backdrop-blur-xl border-b border-[var(--border-accent)] ${
-          mobileMenuOpen ? 'max-h-[400px] opacity-100' : 'max-h-0 opacity-0'
+          mobileMenuOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
         }`}
       >
-        <div className="px-4 pt-2 pb-6 space-y-2 flex flex-col">
+        <div className="px-4 pt-2 pb-6 space-y-1 flex flex-col">
           {navItems.map((item) => {
             const isExactActive = pathname === item.href;
 
@@ -136,7 +140,7 @@ export default function Navbar() {
                 key={item.href}
                 href={item.href}
                 onClick={handleLinkClick}
-                className={`block px-3 py-3 rounded-lg text-base font-medium transition-all ${
+                className={`block px-4 py-4 rounded-xl text-base font-semibold transition-all min-h-[52px] flex items-center ${
                   isExactActive
                     ? 'bg-[rgba(124,58,237,0.15)] text-[var(--accent-cyan-light)]'
                     : 'text-[var(--text-primary)] hover:bg-[rgba(255,255,255,0.05)] hover:text-white'
@@ -153,7 +157,7 @@ export default function Navbar() {
           {(mounted && currentUser) && (
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 px-3 py-3 w-full text-left rounded-lg text-base font-medium text-red-400 hover:bg-red-500/10 transition-colors mt-2"
+              className="flex items-center gap-2 px-4 py-4 w-full text-left rounded-xl text-base font-semibold text-red-400 hover:bg-red-500/10 transition-colors mt-2 min-h-[52px]"
             >
               <LogOut size={20} />
               {t(language, 'logoutNav' as any)}
@@ -171,16 +175,6 @@ export default function Navbar() {
           </div>
         </div>
       )}
-      
-      {/* Dynamic styles for glowing texts and borders */}
-      <style dangerouslySetInnerHTML={{__html: `
-        .glow-text {
-          text-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
-        }
-        .glow-border {
-          box-shadow: 0 4px 10px -2px rgba(157, 0, 255, 0.8);
-        }
-      `}} />
     </nav>
   );
 }

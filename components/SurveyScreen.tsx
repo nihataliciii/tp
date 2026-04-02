@@ -84,7 +84,7 @@ export default function SurveyScreen() {
   const maxText = surveyLabels.maxLabel[language] || 'Max';
 
   return (
-    <div className="w-full max-w-lg flex flex-col gap-6 mx-auto relative z-10 shrink-0">
+    <div className="w-full max-w-2xl flex flex-col gap-8 mx-auto relative z-10 shrink-0">
       {/* Header */}
         <div>
           <div className="flex justify-between items-center mb-1">
@@ -108,12 +108,12 @@ export default function SurveyScreen() {
         </div>
 
         {/* Question Card */}
-        <div className="glass-card p-6 flex-1 shrink-0 overflow-visible">
-          <h2 className="text-xl font-bold mb-2 leading-snug" style={{ color: 'var(--text-primary)' }}>
+        <div className="glass-card p-8 flex-1 shrink-0 overflow-visible">
+          <h2 className="text-2xl font-bold mb-3 leading-snug" style={{ color: 'var(--text-primary)' }}>
             {q.question}
           </h2>
           {q.subtext && (
-            <p className="text-sm mb-5" style={{ color: 'var(--text-muted)' }}>{q.subtext}</p>
+            <p className="text-base mb-6" style={{ color: 'var(--text-muted)' }}>{q.subtext}</p>
           )}
 
           {/* Input */}
@@ -130,20 +130,20 @@ export default function SurveyScreen() {
                     value={localValue}
                     onChange={(e) => setLocalValue(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && canProceed() && handleNext()}
-                    className="input-field text-2xl font-bold text-center pr-16"
+                    className="input-field text-4xl font-bold text-center pr-20"
                     placeholder="0"
-                    style={{ fontSize: '28px', height: '72px', borderColor: localValue ? color : '' }}
+                    style={{ fontSize: '36px', height: '90px', borderColor: localValue ? color : '' }}
                   />
                   {q.unit && (
                     <span
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-medium"
-                      style={{ color: 'var(--text-muted)' }}
+                      className="absolute right-5 top-1/2 -translate-y-1/2 text-base font-semibold"
+                      style={{ color: 'var(--text-secondary)' }}
                     >
                       {q.unit}
                     </span>
                   )}
                 </div>
-                <div className="flex justify-between text-xs" style={{ color: 'var(--text-muted)' }}>
+                <div className="flex justify-between text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>
                   <span>{minText}: {q.min} {q.unit}</span>
                   <span>{maxText}: {q.max} {q.unit}</span>
                 </div>
@@ -151,31 +151,39 @@ export default function SurveyScreen() {
             )}
 
             {q.type === 'choice' && q.choices && (
-              <div className="flex flex-col gap-2.5 mt-2">
+              <div className="flex flex-col gap-3 mt-3">
                 {q.choices.map((choice) => (
                   <button
                     key={choice.value}
                     onClick={() => setSelectedChoice(choice.value)}
-                    className="w-full text-left p-4 rounded-xl transition-all duration-200 border"
+                    className="w-full text-left py-5 px-5 rounded-xl transition-all duration-200 border"
                     style={{
                       background: selectedChoice === choice.value
-                        ? `${color}15`
-                        : 'rgba(13,13,20,0.6)',
-                      borderColor: selectedChoice === choice.value ? color : 'var(--border-accent)',
-                      color: selectedChoice === choice.value ? 'var(--text-primary)' : 'var(--text-secondary)',
-                      boxShadow: selectedChoice === choice.value ? `0 0 15px ${color}30` : 'none',
+                        ? `${color}18`
+                        : 'var(--bg-card)',
+                      borderColor: selectedChoice === choice.value
+                        ? color
+                        : 'var(--border-accent)',
+                      color: selectedChoice === choice.value
+                        ? 'var(--text-primary)'
+                        : 'var(--text-primary)',
+                      boxShadow: selectedChoice === choice.value
+                        ? `0 0 15px ${color}30`
+                        : 'none',
                     }}
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-4">
                       <div
-                        className="w-5 h-5 rounded-full border-2 flex-shrink-0 transition-all"
+                        className="w-6 h-6 rounded-full border-2 flex-shrink-0 transition-all"
                         style={{
                           borderColor: selectedChoice === choice.value ? color : 'var(--text-muted)',
                           background: selectedChoice === choice.value ? color : 'transparent',
                           boxShadow: selectedChoice === choice.value ? `0 0 8px ${color}` : 'none',
                         }}
                       />
-                      <span className="text-sm font-medium">{choice.label}</span>
+                      <span className="text-base font-medium" style={{ color: 'var(--text-primary)' }}>
+                        {choice.label}
+                      </span>
                     </div>
                   </button>
                 ))}
@@ -185,15 +193,15 @@ export default function SurveyScreen() {
 
           {/* Academic Fact */}
           <div
-            className="mt-6 p-4 rounded-xl flex gap-3"
+            className="mt-8 p-5 rounded-xl flex gap-4"
             style={{ background: 'rgba(124,58,237,0.07)', border: '1px solid rgba(124,58,237,0.15)' }}
           >
-            <FlaskConical size={14} className="mt-0.5 flex-shrink-0" style={{ color: '#a855f7' }} />
+            <FlaskConical size={16} className="mt-0.5 flex-shrink-0" style={{ color: '#a855f7' }} />
             <div>
-              <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+              <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
                 {q.academicFact}
               </p>
-              <p className="text-xs mt-1.5 font-semibold" style={{ color: '#6366f1' }}>
+              <p className="text-sm mt-2 font-semibold" style={{ color: '#6366f1' }}>
                 — {q.factSource}
               </p>
             </div>

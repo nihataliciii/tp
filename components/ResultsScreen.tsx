@@ -161,43 +161,46 @@ export default function ResultsScreen() {
   const Icon = analysis.icon;
 
   return (
-    <div className="w-full max-w-lg flex flex-col gap-6 mx-auto relative z-10">
+    <div className="w-full max-w-4xl flex flex-col gap-8 mx-auto relative z-10">
       {/* Header */}
         <div className="text-center">
-          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+          <p className="text-base" style={{ color: 'var(--text-muted)' }}>
             {t(language, 'resultsForUser', { name: user?.name || '' })}
           </p>
-          <h1 className="text-2xl font-bold mt-1" style={{ color: 'var(--text-primary)' }}>
+          <h1
+            className="text-5xl md:text-6xl font-black mt-2 uppercase"
+            style={{ color: 'var(--text-primary)', fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: '0.06em' }}
+          >
             {t(language, 'resultsTitle')}
           </h1>
         </div>
 
         {/* Main result card */}
         <div
-          className="glass-card p-6"
+          className="glass-card p-8 md:p-10"
           style={{
             borderColor: `${analysis.color}40`,
-            boxShadow: `0 0 30px ${analysis.color}20`,
+            boxShadow: `0 0 40px ${analysis.color}15`,
           }}
         >
-          <div className="flex items-center gap-3 mb-4">
+          <div className="flex items-center gap-4 mb-5">
             <div
-              className="w-11 h-11 rounded-xl flex items-center justify-center"
+              className="w-16 h-16 rounded-2xl flex items-center justify-center"
               style={{ background: `${analysis.color}20` }}
             >
-              <Icon size={22} style={{ color: analysis.color }} />
+              <Icon size={32} style={{ color: analysis.color }} />
             </div>
-            <h2 className="text-lg font-bold" style={{ color: analysis.color }}>
+            <h2 className="text-3xl font-black" style={{ color: analysis.color, fontFamily: "'Barlow Condensed', sans-serif" }}>
               {analysis.headline}
             </h2>
           </div>
-          <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+          <p className="text-lg leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
             {analysis.subtext}
           </p>
         </div>
 
         {/* Stats grid */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
             {
               label: t(language, 'resultsAvgError'),
@@ -226,23 +229,24 @@ export default function ResultsScreen() {
           ].map((stat) => (
             <div
               key={stat.label}
-              className="glass-card p-4 text-center"
+              className="glass-card p-6 text-center"
               style={{ borderColor: `${stat.color}30` }}
             >
               <p
-                className="text-2xl font-black"
+                className="text-4xl font-black"
                 style={{
                   background: `linear-gradient(135deg, ${stat.color}, ${stat.color}99)`,
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
+                  fontFamily: "'Barlow Condensed', sans-serif",
                 }}
               >
                 {stat.value}
               </p>
-              <p className="text-xs mt-1 font-semibold" style={{ color: 'var(--text-secondary)' }}>
+              <p className="text-sm mt-2 font-bold" style={{ color: 'var(--text-secondary)' }}>
                 {stat.label}
               </p>
-              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+              <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
                 {stat.sub}
               </p>
             </div>
@@ -250,6 +254,7 @@ export default function ResultsScreen() {
         </div>
 
         {/* Performance Chart */}
+
         <div className="glass-card p-5">
           <h3 className="text-sm font-bold mb-4" style={{ color: 'var(--text-secondary)' }}>
             {t(language, 'resultsChartTitle')}

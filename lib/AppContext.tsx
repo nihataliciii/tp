@@ -1,7 +1,7 @@
 'use client';
 
-import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
-import { questions, Question } from '@/lib/questionsData';
+import React, { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react';
+import { questions } from '@/lib/questionsData';
 import { Language } from '@/lib/i18n';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -21,19 +21,23 @@ export interface RoundResult {
 
 export type AppStage =
   | 'auth'
+  | 'intro'
   | 'survey'
   | 'loading'
   | 'test'
   | 'results';
 
+export type ThemeMode = 'dark' | 'light' | 'auto';
+
 interface AppState {
   stage: AppStage;
   user: { name: string; email: string } | null;
   answers: Answer[];
-  expectedTPR: number | null; // Time Perception Ratio (NEVER displayed)
+  expectedTPR: number | null;
   roundResults: RoundResult[];
   currentRound: number;
   language: Language;
+  theme: ThemeMode;
 }
 
 interface AppContextValue extends AppState {
@@ -44,36 +48,23 @@ interface AppContextValue extends AppState {
   computeTPR: () => void;
   addRoundResult: (result: RoundResult) => void;
   resetApp: () => void;
+  setTheme: (theme: ThemeMode) => void;
 }
 
 // ─── Calculation Engine ───────────────────────────────────────────────────────
 
-/**
- * Computes the Time Perception Ratio (TPR)
- * Based on scientific literature weights.
- * 
- * TPR = 1.0 means baseline (healthy) time perception.
- * TPR < 1.0 means time feels faster than it is (underestimation of durations).
- * TPR > 1.0 means time feels slower (overestimation of durations).
- */
 export function computeTimePerceptionRatio(answers: Answer[]): number {
   let impact = 0;
-
   for (const answer of answers) {
     const question = questions.find((q) => q.id === answer.questionId);
     if (!question) continue;
-
     if (question.type === 'number' && question.impactFn) {
       impact += question.impactFn(answer.value);
     } else if (question.type === 'choice' && question.choices) {
       const selected = question.choices.find((c) => c.value === answer.value);
-      if (selected) {
-        impact += selected.coefficient;
-      }
+      if (selected) impact += selected.coefficient;
     }
   }
-
-  // Clamp TPR between 0.4 and 1.3
   const tpr = Math.max(0.4, Math.min(1.3, 1.0 + impact));
   return Math.round(tpr * 1000) / 1000;
 }
@@ -88,12 +79,31 @@ const initialState: AppState = {
   roundResults: [],
   currentRound: 0,
   language: 'tr',
+  theme: 'auto',
 };
 
 const AppContext = createContext<AppContextValue | null>(null);
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<AppState>(initialState);
+  const [state, setState] = useState<AppState>(() => {
+    // Persist theme preference
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('tp-theme') as ThemeMode | null;
+      if (saved) return { ...initialState, theme: saved };
+    }
+    return initialState;
+  });
+
+  // Apply data-theme attribute to <html> whenever theme changes
+  useEffect(() => {
+    const root = document.documentElement;
+    if (state.theme === 'auto') {
+      root.removeAttribute('data-theme');
+    } else {
+      root.setAttribute('data-theme', state.theme);
+    }
+    localStorage.setItem('tp-theme', state.theme);
+  }, [state.theme]);
 
   const setLanguage = useCallback((lang: Language) => {
     setState((prev) => ({ ...prev, language: lang }));
@@ -105,6 +115,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const setUser = useCallback((user: { name: string; email: string }) => {
     setState((prev) => ({ ...prev, user }));
+  }, []);
+
+  const setTheme = useCallback((theme: ThemeMode) => {
+    setState((prev) => ({ ...prev, theme }));
   }, []);
 
   const submitAnswer = useCallback((answer: Answer) => {
@@ -135,7 +149,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const resetApp = useCallback(() => {
-    setState(initialState);
+    setState((prev) => ({ ...initialState, language: prev.language, theme: prev.theme }));
   }, []);
 
   return (
@@ -145,6 +159,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setLanguage,
         setStage,
         setUser,
+        setTheme,
         submitAnswer,
         computeTPR,
         addRoundResult,

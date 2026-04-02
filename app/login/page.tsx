@@ -269,30 +269,33 @@ export default function LoginPage() {
               </div>
             )}
 
-            {/* SUBMIT BUTTON */}
-            <button
-              type="submit"
-              className="w-full relative overflow-hidden bg-white text-black font-bold text-base h-14 rounded-xl shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:shadow-[0_0_30px_rgba(255,255,255,0.4)] transition-all transform hover:-translate-y-1 disabled:opacity-70 disabled:hover:translate-y-0 disabled:hover:shadow-none mt-2 animate-fade-in-up"
-              disabled={loading}
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-[var(--accent-cyan)] to-[var(--accent-purple-light)] opacity-0 hover:opacity-10 transition-opacity" />
-              <div className="absolute inset-0 flex items-center justify-center gap-2 z-10">
-                {loading ? (
-                  <>
-                    <div className="w-5 h-5 border-2 border-black/20 border-t-black rounded-full animate-spin" />
-                    <span>{t(language, 'checking')}</span>
-                  </>
-                ) : (
-                  <>
-                    <span>
-                      {mode === 'login' ? t(language, 'loginBtn') : mode === 'signup' ? t(language, 'signupBtn') : t(language, 'resetPassBtn')}
-                    </span>
-                    <ChevronRight size={18} />
-                  </>
-                )}
-              </div>
-            </button>
+            {/* SUBMIT BUTTON — separated with clear spacing from inputs */}
+            <div className="mt-8 pt-5 border-t border-white/10">
+              <button
+                type="submit"
+                className="w-full relative overflow-hidden bg-white text-black font-bold text-base h-14 rounded-xl shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:shadow-[0_0_30px_rgba(255,255,255,0.4)] transition-all transform hover:-translate-y-1 disabled:opacity-70 disabled:hover:translate-y-0 disabled:hover:shadow-none animate-fade-in-up"
+                disabled={loading}
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-[var(--accent-cyan)] to-[var(--accent-purple-light)] opacity-0 hover:opacity-10 transition-opacity" />
+                <div className="absolute inset-0 flex items-center justify-center gap-2 z-10">
+                  {loading ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-black/20 border-t-black rounded-full animate-spin" />
+                      <span>{t(language, 'checking')}</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>
+                        {mode === 'login' ? t(language, 'loginBtn') : mode === 'signup' ? t(language, 'signupBtn') : t(language, 'resetPassBtn')}
+                      </span>
+                      <ChevronRight size={18} />
+                    </>
+                  )}
+                </div>
+              </button>
+            </div>
           </form>
+
 
           {isAuthMode && (
             <p className="text-center mt-6 text-xs text-[var(--text-muted)] leading-relaxed max-w-xs mx-auto animate-fade-in-up">
