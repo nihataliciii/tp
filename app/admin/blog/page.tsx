@@ -2,51 +2,47 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useApp } from '@/lib/AppContext';
+import { createClient } from '@/utils/supabase/client';
 import { useBlogStore } from '@/lib/useBlogStore';
-import { useAuthStore } from '@/lib/useAuthStore';
-import { t } from '@/lib/i18n';
-import { FileEdit, Trash2, PlusCircle, Save, UploadCloud, FileText, Image as ImageIcon, X } from 'lucide-react';
+import {
+  FileEdit, Trash2, PlusCircle, Save, UploadCloud, FileText, X,
+} from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
 import imageCompression from 'browser-image-compression';
 
 export default function AdminBlogPage() {
   const router = useRouter();
-  const { language } = useApp();
-  const { currentUser } = useAuthStore();
   const { posts, addPost, deletePost, isLoaded } = useBlogStore();
-  
-  const [formData, setFormData] = useState({
-    title: '',
-    summary: '',
-    content: '',
-    category: ''
-  });
 
+  const [authorized, setAuthorized] = useState(false);
+  const [formData, setFormData] = useState({ title: '', summary: '', content: '', category: '' });
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
 
-  // Authorization Check & Redirect
   useEffect(() => {
-    if (!currentUser || currentUser.email.toLowerCase() !== 'admin@admin.com') {
-      router.push('/login');
-    }
-  }, [currentUser, router]);
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data }) => {
+      if (!data.user || data.user.email?.toLowerCase() !== 'admin@admin.com') {
+        router.push('/login');
+      } else {
+        setAuthorized(true);
+      }
+    });
+  }, [router]);
 
-  const onDrop = async (acceptedFiles: File[]) => {
-    for (const file of acceptedFiles) {
+  const onDrop = async (accepted: File[]) => {
+    for (const file of accepted) {
       if (file.type.startsWith('image/')) {
-        const options = { maxSizeMB: 1, maxWidthOrHeight: 1920, useWebWorker: true };
         try {
-          const compressed = await imageCompression(file, options);
+          const compressed = await imageCompression(file, {
+            maxSizeMB: 1, maxWidthOrHeight: 1920, useWebWorker: true,
+          });
           setImageFile(compressed);
           setImagePreview(URL.createObjectURL(compressed));
-        } catch (error) {
-          console.error("Compression error:", error);
-        }
+        } catch (err) { console.error('Compression error', err); }
       } else if (file.type === 'application/pdf') {
         if (file.size > 5 * 1024 * 1024) {
           alert("PDF dosyası 5MB'dan küçük olmalıdır.");
@@ -61,56 +57,56 @@ export default function AdminBlogPage() {
     onDrop,
     accept: {
       'image/*': ['.jpeg', '.jpg', '.png', '.webp'],
-      'application/pdf': ['.pdf']
-    }
+      'application/pdf': ['.pdf'],
+    },
   });
 
-  if (!currentUser || currentUser.email.toLowerCase() !== 'admin@admin.com') {
-    return null; 
-  }
-
-  if (!isLoaded) return null;
+  const uploadToSupabase = async (file: File, bucket: string, path: string): Promise<string> => {
+    const supabase = createClient();
+    const { error } = await supabase.storage
+      .from(bucket)
+      .upload(path, file, { upsert: true, contentType: file.type });
+    if (error) throw error;
+    const { data } = supabase.storage.from(bucket).getPublicUrl(path);
+    return data.publicUrl;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.title || !formData.content) return;
-    
+
     let uploadedImageUrl = '';
-    let uploadedPdfUrl = undefined;
+    let uploadedPdfUrl: string | undefined;
 
     if (imageFile || pdfFile) {
       setIsUploading(true);
-      setUploadProgress(0);
+      setUploadProgress(10);
       try {
-        const result = await new Promise<{imageUrl: string, pdfUrl: string}>((resolve, reject) => {
-          const xhr = new XMLHttpRequest();
-          xhr.open('POST', '/api/blog/upload');
-          xhr.upload.onprogress = (e) => {
-            if (e.lengthComputable) {
-              setUploadProgress(Math.round((e.loaded / e.total) * 100));
-            }
-          };
-          xhr.onload = () => {
-            if (xhr.status >= 200 && xhr.status < 300) {
-              resolve(JSON.parse(xhr.responseText));
-            } else {
-              reject(new Error("Upload failed"));
-            }
-          };
-          xhr.onerror = () => reject(new Error("Network Error"));
-          
-          const fd = new FormData();
-          if (imageFile) fd.append('image', imageFile);
-          if (pdfFile) fd.append('pdf', pdfFile);
-          xhr.send(fd);
-        });
+        const timestamp = Date.now();
 
-        if (result.imageUrl) uploadedImageUrl = result.imageUrl;
-        if (result.pdfUrl) uploadedPdfUrl = result.pdfUrl;
+        if (imageFile) {
+          const ext = imageFile.name.split('.').pop() ?? 'jpg';
+          setUploadProgress(40);
+          uploadedImageUrl = await uploadToSupabase(
+            imageFile, 'blog-media', `images/${timestamp}.${ext}`
+          );
+          setUploadProgress(70);
+        }
+
+        if (pdfFile) {
+          setUploadProgress(80);
+          uploadedPdfUrl = await uploadToSupabase(
+            pdfFile, 'blog-media', `pdfs/${timestamp}.pdf`
+          );
+          setUploadProgress(95);
+        }
+
+        setUploadProgress(100);
       } catch (err) {
         console.error(err);
-        alert("Dosya yüklenirken hata oluştu!");
+        alert('Dosya yüklenirken hata oluştu!');
         setIsUploading(false);
+        setUploadProgress(0);
         return;
       }
       setIsUploading(false);
@@ -122,7 +118,7 @@ export default function AdminBlogPage() {
       content: formData.content,
       imageUrl: uploadedImageUrl || 'https://images.unsplash.com/photo-1550592704-6c7b94b053dd?auto=format&fit=crop&q=80',
       pdfUrl: uploadedPdfUrl,
-      category: formData.category || 'Genel'
+      category: formData.category || 'Genel',
     });
 
     setFormData({ title: '', summary: '', content: '', category: '' });
@@ -132,151 +128,190 @@ export default function AdminBlogPage() {
     setUploadProgress(0);
   };
 
+  if (!authorized || !isLoaded) return null;
+
   return (
-    <div className="min-h-[calc(100vh-64px)] w-full p-6 lg:p-12 relative">
-      <div className="max-w-6xl mx-auto space-y-12">
-        <header className="flex justify-between items-center mb-8 border-b border-[var(--border-accent)] pb-6">
-          <h1 className="text-3xl font-bold text-white flex items-center gap-3">
-            <FileEdit className="text-[var(--accent-purple)]" /> 
-            {t(language, 'adminPanel')}
-          </h1>
-        </header>
+    <div className="min-h-full bg-white">
+      {/* Header */}
+      <div className="border-b border-gray-100 px-8 py-6">
+        <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-3" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+          <FileEdit size={24} className="text-indigo-500" />
+          Admin Panel — Blog
+        </h1>
+        <p className="text-sm text-gray-400 mt-1">Yazı oluştur, yönet ve yayınla</p>
+      </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Create Form */}
-          <div className="lg:col-span-1 glass-card p-6 h-fit sticky top-24">
-            <h2 className="text-xl font-semibold text-white mb-6 flex items-center gap-2">
-              <PlusCircle size={20} className="text-[var(--accent-cyan)]" />
-              {t(language, 'newPost')}
-            </h2>
-            <form onSubmit={handleSubmit} className="space-y-4 flex flex-col relative">
-              <input
-                className="input-field"
-                placeholder={t(language, 'title')}
-                value={formData.title}
-                onChange={e => setFormData({...formData, title: e.target.value})}
-                required
-                disabled={isUploading}
-              />
-              <input
-                className="input-field"
-                placeholder="Özet"
-                value={formData.summary}
-                onChange={e => setFormData({...formData, summary: e.target.value})}
-                required
-                disabled={isUploading}
-              />
-              <input
-                className="input-field"
-                placeholder={t(language, 'category')}
-                value={formData.category}
-                onChange={e => setFormData({...formData, category: e.target.value})}
-                disabled={isUploading}
-              />
-              
-              {/* Drag and Drop Zone */}
-              <div 
-                {...getRootProps()} 
-                className={`w-full border-2 border-dashed rounded-xl p-6 flex flex-col justify-center items-center text-center cursor-pointer transition-all duration-300 ${
-                  isDragActive 
-                    ? 'border-[var(--accent-purple)] bg-[rgba(124,58,237,0.1)] shadow-[0_0_30px_rgba(124,58,237,0.3)]' 
-                    : 'border-[var(--text-muted)] hover:border-[var(--accent-cyan)] hover:bg-[rgba(6,182,212,0.05)]'
-                }`}
-              >
-                <input {...getInputProps()} disabled={isUploading} />
-                <UploadCloud size={40} className={isDragActive ? 'text-[var(--accent-purple)]' : 'text-[var(--text-muted)]'} />
-                <p className="mt-3 text-sm font-medium text-[var(--text-primary)]">
-                  {isDragActive ? 'Dosyaları buraya bırakın...' : 'Dosyaları Buraya Sürükleyin veya Tıklayın'}
-                </p>
-                <p className="mt-1 text-xs text-[var(--text-muted)] px-4">
-                  Image (Kapak) ve PDF (Ek Kaynak) desteklenir.
-                </p>
-              </div>
+      <div className="px-8 py-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
 
-              {/* Upload Previews */}
-              {(imagePreview || pdfFile) && (
-                <div className="flex flex-col gap-2 mt-2 bg-black/20 p-3 rounded-xl border border-[var(--border-accent)]">
-                  <h3 className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider mb-1">Eklenecek Dosyalar</h3>
-                  {imagePreview && (
-                    <div className="flex justify-between items-center bg-black/40 p-2 rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <img src={imagePreview} alt="cover" className="w-10 h-10 rounded object-cover" />
-                        <span className="text-sm font-medium truncate max-w-[150px]">{imageFile?.name}</span>
-                      </div>
-                      <button type="button" onClick={() => { setImageFile(null); setImagePreview(null); }} className="p-1 hover:text-red-400">
-                        <X size={16} />
-                      </button>
-                    </div>
-                  )}
-                  {pdfFile && (
-                    <div className="flex justify-between items-center bg-black/40 p-2 rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-[var(--accent-purple)]/20 rounded flex items-center justify-center text-[var(--accent-purple-light)]">
-                          <FileText size={20} />
-                        </div>
-                        <span className="text-sm font-medium truncate max-w-[150px]">{pdfFile.name}</span>
-                      </div>
-                      <button type="button" onClick={() => setPdfFile(null)} className="p-1 hover:text-red-400">
-                        <X size={16} />
-                      </button>
-                    </div>
-                  )}
+          {/* ── Create Form ── */}
+          <div className="lg:col-span-2">
+            <div className="saas-card p-6 sticky top-6">
+              <h2 className="text-base font-semibold text-gray-800 flex items-center gap-2 mb-5" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+                <PlusCircle size={17} className="text-indigo-500" />
+                Yeni Yazı
+              </h2>
+
+              <form onSubmit={handleSubmit} className="space-y-3">
+                <input
+                  className="saas-input"
+                  placeholder="Başlık *"
+                  value={formData.title}
+                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  required
+                  disabled={isUploading}
+                />
+                <input
+                  className="saas-input"
+                  placeholder="Özet"
+                  value={formData.summary}
+                  onChange={(e) => setFormData({ ...formData, summary: e.target.value })}
+                  disabled={isUploading}
+                />
+                <input
+                  className="saas-input"
+                  placeholder="Kategori"
+                  value={formData.category}
+                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  disabled={isUploading}
+                />
+
+                {/* Drag & Drop Zone */}
+                <div
+                  {...getRootProps()}
+                  className={`w-full border-2 border-dashed rounded-xl p-5 flex flex-col items-center text-center cursor-pointer transition-all ${
+                    isDragActive
+                      ? 'border-indigo-400 bg-indigo-50'
+                      : 'border-gray-200 hover:border-indigo-300 hover:bg-gray-50'
+                  }`}
+                >
+                  <input {...getInputProps()} disabled={isUploading} />
+                  <UploadCloud
+                    size={32}
+                    className={isDragActive ? 'text-indigo-500' : 'text-gray-300'}
+                  />
+                  <p className="mt-2 text-sm font-medium text-gray-600">
+                    {isDragActive ? 'Bırakın...' : 'Sürükle & Bırak veya Tıkla'}
+                  </p>
+                  <p className="text-xs text-gray-400 mt-1">Görsel (kapak) ve PDF (ek kaynak)</p>
                 </div>
-              )}
 
-              <textarea
-                className="input-field min-h-[200px] resize-y"
-                placeholder={t(language, 'content')}
-                value={formData.content}
-                onChange={e => setFormData({...formData, content: e.target.value})}
-                required
-                disabled={isUploading}
-              />
-              
-              {isUploading ? (
-                <div className="mt-2 text-center w-full">
-                  <div className="w-full h-8 bg-black/50 rounded-xl overflow-hidden border border-[var(--border-accent)] relative">
-                    <div 
-                      className="absolute top-0 left-0 h-full bg-gradient-to-r from-[var(--accent-purple)] to-[var(--accent-cyan)] transition-all duration-300 ease-out"
+                {/* File Previews */}
+                {(imagePreview || pdfFile) && (
+                  <div className="space-y-2 bg-gray-50 p-3 rounded-xl border border-gray-100">
+                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Eklenecek Dosyalar</p>
+
+                    {imagePreview && (
+                      <div className="flex items-center justify-between bg-white p-2 rounded-lg border border-gray-100">
+                        <div className="flex items-center gap-2">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={imagePreview} alt="cover" className="w-9 h-9 rounded object-cover" />
+                          <span className="text-sm text-gray-700 truncate max-w-[140px]">{imageFile?.name}</span>
+                        </div>
+                        <button type="button" onClick={() => { setImageFile(null); setImagePreview(null); }} className="text-gray-400 hover:text-red-400 p-1">
+                          <X size={15} />
+                        </button>
+                      </div>
+                    )}
+
+                    {pdfFile && (
+                      <div className="flex items-center justify-between bg-white p-2 rounded-lg border border-gray-100">
+                        <div className="flex items-center gap-2">
+                          <div className="w-9 h-9 bg-indigo-50 rounded flex items-center justify-center text-indigo-500">
+                            <FileText size={16} />
+                          </div>
+                          <span className="text-sm text-gray-700 truncate max-w-[140px]">{pdfFile.name}</span>
+                        </div>
+                        <button type="button" onClick={() => setPdfFile(null)} className="text-gray-400 hover:text-red-400 p-1">
+                          <X size={15} />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <textarea
+                  className="saas-input min-h-[180px] resize-y"
+                  placeholder="İçerik *"
+                  value={formData.content}
+                  onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                  required
+                  disabled={isUploading}
+                />
+
+                {/* Upload progress */}
+                {isUploading && (
+                  <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-indigo-500 transition-all duration-300 rounded-full"
                       style={{ width: `${uploadProgress}%` }}
                     />
-                    <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white text-[text-shadow:0_0_4px_black] mix-blend-plus-lighter">
-                      % {uploadProgress} Yükleniyor...
-                    </div>
                   </div>
-                </div>
-              ) : (
-                <button type="submit" className="btn-primary flex items-center justify-center gap-2 mt-2 w-full">
-                  <Save size={18} /> {t(language, 'saveRef')}
+                )}
+
+                <button
+                  type="submit"
+                  disabled={isUploading}
+                  className="saas-btn w-full flex items-center justify-center gap-2"
+                >
+                  {isUploading ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Yükleniyor... {uploadProgress}%
+                    </>
+                  ) : (
+                    <>
+                      <Save size={16} /> Kaydet & Yayınla
+                    </>
+                  )}
                 </button>
-              )}
-            </form>
+              </form>
+            </div>
           </div>
 
-          {/* Posts List */}
-          <div className="lg:col-span-2 space-y-4">
-            <h2 className="text-xl font-semibold text-white mb-6">Mevcut Yazılar ({posts.length})</h2>
+          {/* ── Post List ── */}
+          <div className="lg:col-span-3 space-y-3">
+            <h2 className="text-base font-semibold text-gray-800 mb-4" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+              Mevcut Yazılar
+              <span className="ml-2 text-sm font-normal text-gray-400">({posts.length})</span>
+            </h2>
+
             {posts.length === 0 ? (
-              <p className="text-[var(--text-muted)]">Burada henüz hiç yazı yok.</p>
+              <div className="text-sm text-gray-400 py-8 text-center border-2 border-dashed border-gray-100 rounded-xl">
+                Henüz hiç yazı yok.
+              </div>
             ) : (
-              posts.map(post => (
-                <div key={post.id} className="glass-card p-5 flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-4 flex-1">
-                    <img src={post.imageUrl} alt="" className="w-16 h-16 rounded-lg object-cover" />
-                    <div>
-                      <h3 className="font-bold text-white text-lg line-clamp-1">{post.title}</h3>
-                      <div className="flex gap-3 text-xs text-[var(--text-muted)] font-medium mt-1">
-                        <span className="text-[var(--accent-cyan)]">{post.category}</span>
-                        <span>•</span>
-                        <span>{new Date(post.date).toLocaleDateString()}</span>
-                      </div>
+              posts.map((post) => (
+                <div
+                  key={post.id}
+                  className="saas-card p-4 flex items-center gap-4 hover:border-indigo-200 transition-colors"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={post.imageUrl}
+                    alt=""
+                    className="w-14 h-14 rounded-lg object-cover shrink-0 bg-gray-100"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-gray-900 truncate text-sm">{post.title}</h3>
+                    <div className="flex items-center gap-2 mt-1 text-xs text-gray-400">
+                      <span className="text-indigo-500 font-medium">{post.category}</span>
+                      <span>·</span>
+                      <span>{new Date(post.date).toLocaleDateString('tr-TR')}</span>
+                      {post.pdfUrl && (
+                        <>
+                          <span>·</span>
+                          <span className="flex items-center gap-1"><FileText size={11} /> PDF</span>
+                        </>
+                      )}
                     </div>
                   </div>
-                  <button 
+                  <button
                     onClick={() => deletePost(post.id)}
-                    className="p-3 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white rounded-xl transition-colors"
+                    className="p-2 text-gray-300 hover:text-red-400 hover:bg-red-50 rounded-lg transition-colors shrink-0"
+                    title="Sil"
                   >
-                    <Trash2 size={20} />
+                    <Trash2 size={16} />
                   </button>
                 </div>
               ))

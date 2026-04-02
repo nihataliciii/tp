@@ -3,6 +3,7 @@
 import { useMemo, useEffect, useRef } from 'react';
 import { useApp } from '@/lib/AppContext';
 import { useAuthStore } from '@/lib/useAuthStore';
+import { createClient } from '@/utils/supabase/client';
 import { t, Language } from '@/lib/i18n';
 import {
   ResponsiveContainer,
@@ -130,21 +131,44 @@ export default function ResultsScreen() {
   const analysis = useMemo(() => analyzeResults(roundResults, tpr, language), [roundResults, tpr, language]);
 
   const savedRef = useRef(false);
-  
+
   useEffect(() => {
-    if (currentUser && roundResults.length > 0 && !savedRef.current) {
-      savedRef.current = true;
-      const statusStr = analysis.profileCategory === 'overperform' ? 'Yavaş Algı' 
-                      : analysis.profileCategory === 'underperform' ? 'Hızlı Algı' : 'Normal Algı';
-                      
+    if (roundResults.length === 0 || savedRef.current) return;
+    savedRef.current = true;
+
+    const statusStr =
+      analysis.profileCategory === 'overperform' ? 'Yavaş Algı'
+      : analysis.profileCategory === 'underperform' ? 'Hızlı Algı'
+      : 'Normal Algı';
+
+    // Legacy local store (still used for offline fallback)
+    if (currentUser) {
       addTestResult(currentUser.id, {
         date: new Date().toISOString(),
         testType: 'Zaman Algısı Testi',
         scoreStr: `${analysis.actualMeanRatio.toFixed(2)}x Oran | ${(tpr * 100).toFixed(0)} Skor`,
-        status: statusStr
+        status: statusStr,
       });
     }
-  }, [currentUser, roundResults, analysis, tpr, addTestResult]);
+
+    // Supabase save
+    const saveToSupabase = async () => {
+      const supabase = createClient();
+      const { data: { user: sbUser } } = await supabase.auth.getUser();
+      if (!sbUser) return;
+
+      await supabase.from('test_results').insert({
+        user_id: sbUser.id,
+        score: analysis.actualMeanRatio,
+        ratio: tpr,
+        status: statusStr,
+        test_type: 'Zaman Algısı Testi',
+      });
+    };
+
+    saveToSupabase();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roundResults.length]);
 
   const chartData = roundResults.map((r) => ({
     round: r.round,

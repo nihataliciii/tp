@@ -1,302 +1,299 @@
 'use client';
 
 import { useState } from 'react';
-import { useApp } from '@/lib/AppContext';
-import { useAuthStore } from '@/lib/useAuthStore';
-import { t } from '@/lib/i18n';
-import { Eye, EyeOff, Lock, Mail, User, ShieldCheck, ChevronRight, ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { createClient } from '@/utils/supabase/client';
+import { Eye, EyeOff, Lock, Mail, User, ChevronRight, ArrowLeft, CheckCircle2, AlertCircle, Clock } from 'lucide-react';
 
 type Mode = 'login' | 'signup' | 'forgot_password';
 
 export default function LoginPage() {
-  const { setStage, setUser, language } = useApp();
-  const { login, register, resetPassword } = useAuthStore();
   const router = useRouter();
-  
   const [mode, setMode] = useState<Mode>('login');
-  
-  // Fields
+
   const [name, setName] = useState('');
-  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
-  
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
 
-  const handleModeSwitch = (newMode: Mode) => {
-    setMode(newMode);
-    setError('');
-    setSuccessMsg('');
-  };
+  const supabase = createClient();
+
+  const switchMode = (m: Mode) => { setMode(m); setError(''); setSuccessMsg(''); };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    if (!identifier || !password) { setError(t(language, 'fillFields')); return; }
-    
+    if (!identifier || !password) { setError('Lütfen tüm alanları doldurun.'); return; }
+
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 800)); // simulate network delay
-    
-    const res = login(identifier, password);
-    if (!res.success) {
-      setError(t(language, res.error === 'user_not_found' ? 'userNotFound' : 'wrongPassword'));
-      setLoading(false);
+    const { error: err } = await supabase.auth.signInWithPassword({
+      email: identifier,
+      password,
+    });
+    setLoading(false);
+
+    if (err) {
+      setError(err.message === 'Invalid login credentials'
+        ? 'E-posta veya şifre hatalı.'
+        : err.message);
       return;
     }
-    
-    setUser({ name: res.user!.fullName, email: res.user!.email });
-    setStage('survey');
+
     router.push('/');
+    router.refresh();
   };
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    if (!name || !username || !email || !password) { setError(t(language, 'fillFields')); return; }
-    
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setError(t(language, 'invalidEmail'));
-      return;
-    }
-    
+    if (!name || !email || !password) { setError('Lütfen tüm alanları doldurun.'); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setError('Geçerli bir e-posta adresi girin.'); return; }
+    if (password.length < 6) { setError('Şifre en az 6 karakter olmalıdır.'); return; }
+
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 800)); // simulate network delay
-    
-    const res = register(name, username, email, password);
-    if (!res.success) {
-      setError(t(language, res.error === 'username_taken' ? 'usernameTaken' : 'emailTaken'));
+
+    const { data, error: signupErr } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { full_name: name },
+      },
+    });
+
+    if (signupErr) {
       setLoading(false);
+      setError(signupErr.message === 'User already registered'
+        ? 'Bu e-posta adresi zaten kayıtlı.'
+        : signupErr.message);
       return;
     }
-    
-    // Auto-login after signup
-    const loginRes = login(username, password);
-    if (loginRes.success) {
-      setUser({ name: loginRes.user!.fullName, email: loginRes.user!.email });
-      setStage('survey');
-      router.push('/');
+
+    // Insert profile row
+    if (data.user) {
+      await supabase.from('profiles').upsert({
+        id: data.user.id,
+        email: data.user.email,
+        full_name: name,
+        created_at: new Date().toISOString(),
+      });
     }
+
+    setLoading(false);
+
+    // If email confirmation is required, inform the user
+    if (!data.session) {
+      setSuccessMsg('Kayıt başarılı! E-posta adresinizi onaylayın, ardından giriş yapabilirsiniz.');
+      switchMode('login');
+      return;
+    }
+
+    router.push('/');
+    router.refresh();
   };
 
   const handleForgotPass = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    setSuccessMsg('');
-    if (!email) { setError(t(language, 'fillFields')); return; }
-    
+    if (!email) { setError('E-posta adresinizi girin.'); return; }
+
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 1000));
-    
-    const res = resetPassword(email);
+    const { error: err } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/auth/callback`,
+    });
     setLoading(false);
-    
-    if (!res.success) {
-      setError(t(language, 'userNotFound'));
-    } else {
-      setSuccessMsg(t(language, 'resetPassSuccess'));
-      setEmail(''); // clear field
-    }
+
+    if (err) { setError(err.message); return; }
+    setSuccessMsg('Şifre sıfırlama bağlantısı e-posta adresinize gönderildi.');
+    setEmail('');
   };
 
   const isAuthMode = mode === 'login' || mode === 'signup';
 
   return (
-    <div className="relative min-h-[calc(100vh-64px)] w-full overflow-x-hidden flex justify-center items-center px-4 py-12">
-      <div className="orb orb-purple opacity-40 animate-float-slow" style={{ top: '10%', right: '10%', width: '40vw', height: '40vw' }} />
-      <div className="orb orb-cyan opacity-40 animate-float-slower" style={{ bottom: '20%', left: '5%', width: '30vw', height: '30vw' }} />
+    <div className="relative min-h-full w-full flex items-center justify-center px-4 py-12 bg-[var(--bg-primary)]">
+      {/* Background orbs */}
+      <div className="orb orb-purple opacity-30 animate-float-slow" style={{ top: '-10%', right: '5%', width: '40vw', height: '40vw' }} />
+      <div className="orb orb-cyan opacity-25 animate-float-slower" style={{ bottom: '5%', left: '-5%', width: '30vw', height: '30vw' }} />
 
       <div className="w-full max-w-md relative animate-fade-in-up">
-        {/* Neon back glow */}
-        <div className="absolute -inset-1 rounded-2xl bg-gradient-to-b from-[var(--accent-cyan)] to-[var(--accent-purple)] opacity-30 blur-2xl" />
-        
-        <div className="glass-card p-8 md:p-10 relative z-20 shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-white/10 rounded-2xl bg-[#0a0a0f]/80">
-          
-          {/* Top Tabs (Only if Login or Signup) */}
+        <div className="absolute -inset-1 rounded-2xl bg-gradient-to-b from-[var(--accent-cyan)] to-[var(--accent-purple)] opacity-25 blur-2xl" />
+
+        <div className="glass-card p-8 md:p-10 relative z-10 border border-white/10 rounded-2xl">
+
+          {/* Logo */}
+          <div className="flex items-center justify-center gap-2 mb-8">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+              <Clock size={16} className="text-white" />
+            </div>
+            <span className="font-bold text-white text-lg" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+              TimePerception
+            </span>
+          </div>
+
+          {/* Tabs */}
           {isAuthMode && (
             <div className="flex mb-8 p-1 rounded-xl bg-black/40 border border-white/5">
               {(['login', 'signup'] as const).map((m) => (
                 <button
                   key={m}
-                  onClick={() => handleModeSwitch(m)}
-                  className="flex-1 py-3 rounded-lg text-sm font-bold transition-all duration-300"
+                  onClick={() => switchMode(m)}
+                  className="flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200"
                   style={{
-                    background: mode === m ? 'linear-gradient(135deg, var(--accent-cyan), var(--accent-purple))' : 'transparent',
+                    background: mode === m ? 'linear-gradient(135deg, #4f46e5, #7c3aed)' : 'transparent',
                     color: mode === m ? 'white' : 'var(--text-muted)',
-                    boxShadow: mode === m ? '0 4px 20px rgba(124,58,237,0.4)' : 'none',
+                    boxShadow: mode === m ? '0 4px 12px rgba(79,70,229,0.35)' : 'none',
                   }}
                 >
-                  {m === 'login' ? t(language, 'loginTab') : t(language, 'signupTab')}
+                  {m === 'login' ? 'Giriş Yap' : 'Kayıt Ol'}
                 </button>
               ))}
             </div>
           )}
 
-          {/* Forgot Password Header */}
+          {/* Forgot password back button */}
           {mode === 'forgot_password' && (
-            <div className="mb-8 text-center animate-fade-in-up">
-              <button 
-                onClick={() => handleModeSwitch('login')}
-                className="flex items-center justify-center gap-1 text-[var(--accent-cyan)] hover:text-white transition-colors text-sm font-medium mx-auto mb-4"
+            <div className="mb-8 text-center">
+              <button
+                onClick={() => switchMode('login')}
+                className="flex items-center justify-center gap-1 text-[var(--accent-cyan)] hover:text-white text-sm font-medium mx-auto mb-4 transition-colors"
               >
-                <ArrowLeft size={16} /> {t(language, 'backToLogin')}
+                <ArrowLeft size={15} /> Girişe Dön
               </button>
-              <h2 className="text-2xl font-bold text-white gradient-text">{t(language, 'resetPassTitle')}</h2>
+              <h2 className="text-xl font-bold text-white gradient-text">Şifreyi Sıfırla</h2>
             </div>
           )}
 
-          <form 
-            onSubmit={mode === 'login' ? handleLogin : mode === 'signup' ? handleSignup : handleForgotPass} 
-            className="flex flex-col gap-5 relative z-10"
+          <form
+            onSubmit={mode === 'login' ? handleLogin : mode === 'signup' ? handleSignup : handleForgotPass}
+            className="flex flex-col gap-4"
           >
-            {/* SIGNUP FIELDS */}
+            {/* Signup: Full name */}
             {mode === 'signup' && (
-              <div className="flex flex-col gap-5 animate-fade-in-up">
-                <div className="relative group">
-                  <User size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] group-focus-within:text-[var(--accent-cyan-light)] transition-colors" />
-                  <input
-                    className="input-field bg-black/40 border-white/10 hover:border-white/20 focus:border-[var(--accent-cyan)] focus:bg-black/60 transition-all text-white placeholder-[var(--text-muted)] font-medium h-14"
-                    style={{ paddingLeft: '3.5rem' }}
-                    type="text"
-                    placeholder={t(language, 'fullNamePlaceholder')}
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                  />
-                </div>
-                <div className="relative group">
-                  <User size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] group-focus-within:text-[var(--accent-cyan-light)] transition-colors" />
-                  <input
-                    className="input-field bg-black/40 border-white/10 hover:border-white/20 focus:border-[var(--accent-cyan)] focus:bg-black/60 transition-all text-white placeholder-[var(--text-muted)] font-medium h-14"
-                    style={{ paddingLeft: '3.5rem' }}
-                    type="text"
-                    placeholder={t(language, 'usernamePlaceholder')}
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                  />
-                </div>
-                <div className="relative group">
-                  <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] group-focus-within:text-[var(--accent-cyan-light)] transition-colors" />
-                  <input
-                    className="input-field bg-black/40 border-white/10 hover:border-white/20 focus:border-[var(--accent-cyan)] focus:bg-black/60 transition-all text-white placeholder-[var(--text-muted)] font-medium h-14"
-                    style={{ paddingLeft: '3.5rem' }}
-                    type="email"
-                    placeholder={t(language, 'emailPlaceholder')}
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </div>
-              </div>
-            )}
-            
-            {/* LOGIN IDENTIFIER */}
-            {mode === 'login' && (
-              <div className="relative group animate-fade-in-up">
-                <User size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] group-focus-within:text-[var(--accent-cyan-light)] transition-colors" />
+              <div className="relative group">
+                <User size={17} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] group-focus-within:text-[var(--accent-cyan)] transition-colors" />
                 <input
-                  className="input-field bg-black/40 border-white/10 hover:border-white/20 focus:border-[var(--accent-cyan)] focus:bg-black/60 transition-all text-white placeholder-[var(--text-muted)] font-medium h-14"
-                  style={{ paddingLeft: '3.5rem' }}
+                  className="input-field h-12"
+                  style={{ paddingLeft: '3rem' }}
                   type="text"
-                  placeholder={t(language, 'emailOrUserPlaceholder')}
-                  value={identifier}
-                  onChange={(e) => setIdentifier(e.target.value)}
+                  placeholder="Ad Soyad"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  autoComplete="name"
                 />
               </div>
             )}
 
-            {/* FORGOT PASS IDENTIFIER */}
-            {mode === 'forgot_password' && (
-              <div className="relative group animate-fade-in-up">
-                <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] group-focus-within:text-[var(--accent-cyan-light)] transition-colors" />
+            {/* Login identifier / Signup email / Forgot email */}
+            {(mode === 'login' || mode === 'forgot_password') && (
+              <div className="relative group">
+                <Mail size={17} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] group-focus-within:text-[var(--accent-cyan)] transition-colors" />
                 <input
-                  className="input-field bg-black/40 border-white/10 hover:border-white/20 focus:border-[var(--accent-cyan)] focus:bg-black/60 transition-all text-white placeholder-[var(--text-muted)] font-medium h-14"
-                  style={{ paddingLeft: '3.5rem' }}
-                  type="email"
-                  placeholder={t(language, 'emailPlaceholder')}
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  className="input-field h-12"
+                  style={{ paddingLeft: '3rem' }}
+                  type={mode === 'login' ? 'text' : 'email'}
+                  placeholder={mode === 'login' ? 'E-posta adresi' : 'E-posta adresiniz'}
+                  value={identifier}
+                  onChange={(e) => setIdentifier(e.target.value)}
+                  autoComplete="email"
                 />
               </div>
             )}
-            
-            {/* PASSWORD FIELD (Login/Signup) */}
+
+            {mode === 'signup' && (
+              <div className="relative group">
+                <Mail size={17} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] group-focus-within:text-[var(--accent-cyan)] transition-colors" />
+                <input
+                  className="input-field h-12"
+                  style={{ paddingLeft: '3rem' }}
+                  type="email"
+                  placeholder="E-posta adresi"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  autoComplete="email"
+                />
+              </div>
+            )}
+
+            {/* Password */}
             {isAuthMode && (
-              <div className="flex flex-col items-end animate-fade-in-up">
+              <div className="flex flex-col items-end">
                 <div className="relative w-full group">
-                  <Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] group-focus-within:text-[var(--accent-cyan-light)] transition-colors" />
+                  <Lock size={17} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] group-focus-within:text-[var(--accent-cyan)] transition-colors" />
                   <input
-                    className="input-field bg-black/40 border-white/10 hover:border-white/20 focus:border-[var(--accent-cyan)] focus:bg-black/60 transition-all text-white placeholder-[var(--text-muted)] font-medium h-14 w-full"
-                    style={{ paddingLeft: '3.5rem', paddingRight: '3.5rem' }}
+                    className="input-field h-12 w-full"
+                    style={{ paddingLeft: '3rem', paddingRight: '3rem' }}
                     type={showPass ? 'text' : 'password'}
-                    placeholder={t(language, 'passwordPlaceholder')}
+                    placeholder="Şifre"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPass(!showPass)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-white transition-colors p-1"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-white transition-colors"
                   >
-                    {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
+                    {showPass ? <EyeOff size={17} /> : <Eye size={17} />}
                   </button>
                 </div>
                 {mode === 'login' && (
-                  <button 
+                  <button
                     type="button"
-                    onClick={() => handleModeSwitch('forgot_password')} 
-                    className="text-xs font-semibold text-[var(--accent-cyan)] hover:text-white mt-3 transition-colors underline underline-offset-4 decoration-white/20"
+                    onClick={() => switchMode('forgot_password')}
+                    className="text-xs font-medium text-[var(--accent-cyan)] hover:text-white mt-2 transition-colors"
                   >
-                    {t(language, 'forgotPassword')}
+                    Şifremi unuttum
                   </button>
                 )}
               </div>
             )}
 
-            {/* FEEDBACK BANNERS */}
+            {/* Error / Success banners */}
             {error && (
-              <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-xl text-sm font-medium text-center shadow-[0_0_15px_rgba(239,68,68,0.15)] flex items-center justify-center gap-2 animate-fade-in-up">
-                <ShieldCheck size={16} className="flex-shrink-0" /> <span className="text-left">{error}</span>
+              <div className="flex items-start gap-2 bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-xl text-sm">
+                <AlertCircle size={15} className="shrink-0 mt-0.5" />
+                <span>{error}</span>
               </div>
             )}
-            
             {successMsg && (
-              <div className="bg-green-500/10 border border-green-500/20 text-green-400 p-3 rounded-xl text-sm font-medium text-center shadow-[0_0_15px_rgba(16,185,129,0.15)] flex items-center justify-center gap-2 animate-fade-in-up">
-                <CheckCircle2 size={16} className="flex-shrink-0" /> <span className="text-left">{successMsg}</span>
+              <div className="flex items-start gap-2 bg-green-500/10 border border-green-500/20 text-green-400 p-3 rounded-xl text-sm">
+                <CheckCircle2 size={15} className="shrink-0 mt-0.5" />
+                <span>{successMsg}</span>
               </div>
             )}
 
-            {/* SUBMIT BUTTON */}
+            {/* Submit */}
             <button
               type="submit"
-              className="w-full relative overflow-hidden bg-white text-black font-bold text-base h-14 rounded-xl shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:shadow-[0_0_30px_rgba(255,255,255,0.4)] transition-all transform hover:-translate-y-1 disabled:opacity-70 disabled:hover:translate-y-0 disabled:hover:shadow-none mt-2 animate-fade-in-up"
               disabled={loading}
+              className="w-full relative overflow-hidden h-12 rounded-xl font-bold text-sm bg-white text-black
+                         shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(255,255,255,0.25)]
+                         transition-all hover:-translate-y-0.5 disabled:opacity-60 disabled:translate-y-0 mt-1"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-[var(--accent-cyan)] to-[var(--accent-purple-light)] opacity-0 hover:opacity-10 transition-opacity" />
-              <div className="absolute inset-0 flex items-center justify-center gap-2 z-10">
+              <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-600 opacity-0 hover:opacity-10 transition-opacity" />
+              <span className="relative flex items-center justify-center gap-2">
                 {loading ? (
                   <>
-                    <div className="w-5 h-5 border-2 border-black/20 border-t-black rounded-full animate-spin" />
-                    <span>{t(language, 'checking')}</span>
+                    <div className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />
+                    Lütfen bekleyin…
                   </>
                 ) : (
                   <>
-                    <span>
-                      {mode === 'login' ? t(language, 'loginBtn') : mode === 'signup' ? t(language, 'signupBtn') : t(language, 'resetPassBtn')}
-                    </span>
-                    <ChevronRight size={18} />
+                    {mode === 'login' ? 'Giriş Yap' : mode === 'signup' ? 'Hesap Oluştur' : 'Sıfırlama Linki Gönder'}
+                    <ChevronRight size={16} />
                   </>
                 )}
-              </div>
+              </span>
             </button>
           </form>
 
           {isAuthMode && (
-            <p className="text-center mt-6 text-xs text-[var(--text-muted)] leading-relaxed max-w-xs mx-auto animate-fade-in-up">
-              {t(language, 'privacyNote')}
+            <p className="text-center mt-5 text-xs text-[var(--text-muted)] leading-relaxed max-w-xs mx-auto">
+              Devam ederek Gizlilik Politikamızı ve Kullanım Şartlarımızı kabul etmiş olursunuz.
             </p>
           )}
         </div>
