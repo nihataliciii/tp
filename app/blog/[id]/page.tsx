@@ -33,11 +33,10 @@ export default function BlogPostDetail() {
   }
 
   return (
-    <article className="relative min-h-[calc(100vh-64px)] w-full bg-[#0a0a0f] text-[var(--text-primary)]">
+    <article className="relative min-h-[calc(100vh-80px)] w-full" style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
       {/* Hero Image Section */}
       <div className="relative w-full h-[40vh] md:h-[50vh] overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0f] via-transparent to-transparent z-10" />
-        <div className="absolute inset-0 bg-[#0a0a0f]/30 z-10" /> {/* Slight dark overlay */}
+        <div className="absolute inset-0 z-10" style={{ background: 'linear-gradient(to top, var(--bg-primary) 10%, transparent)' }} />
         <img 
           src={post.imageUrl} 
           alt={post.title} 
@@ -62,14 +61,14 @@ export default function BlogPostDetail() {
               </time>
             </div>
           </div>
-          <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-white leading-tight font-space text-shadow">
+          <h1 className="text-2xl md:text-4xl font-bold leading-tight" style={{ color: 'var(--text-primary)' }}>
             {post.title}
           </h1>
         </div>
       </div>
 
       {/* Content Section */}
-      <div className="max-w-3xl mx-auto px-6 py-12 md:py-20 relative z-20 bg-[#0a0a0f]">
+      <div className="max-w-3xl mx-auto px-6 py-10 relative z-20" style={{ background: 'var(--bg-primary)' }}>
         <div className="prose prose-invert prose-lg md:prose-xl max-w-none">
           
           {post.pdfUrl && (

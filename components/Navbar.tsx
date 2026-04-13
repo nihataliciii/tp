@@ -62,13 +62,19 @@ export default function Navbar() {
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[var(--accent-purple)] to-[var(--accent-cyan)] flex items-center justify-center shadow-[0_0_12px_var(--glow-purple)]">
               <Timer size={18} className="text-white" />
             </div>
-            <span className="text-xl font-bold tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent-purple-light)] to-[var(--accent-cyan)] uppercase" style={{ fontFamily: "'Formula1', 'Inter', sans-serif", letterSpacing: '0.08em' }}>
+            <span
+              className="text-sm font-bold tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent-purple-light)] to-[var(--accent-cyan)] uppercase"
+              style={{ fontFamily: "'Formula1', 'Inter Tight', sans-serif", letterSpacing: '0.08em' }}
+            >
               TimePerception
             </span>
           </Link>
 
-          {/* Center: Nav Links (desktop) */}
-          <div className="hidden lg:flex flex-1 items-center justify-center gap-0.5 overflow-hidden">
+          {/* Center: Nav Links (desktop) — overflow-x-auto so they never wrap */}
+          <div
+            className="hidden lg:flex flex-1 items-center justify-center gap-3"
+            style={{ overflowX: 'auto', scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
             {navItems.map((item) => {
               const isExactActive = pathname === item.href;
               
@@ -76,10 +82,10 @@ export default function Navbar() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`relative font-semibold transition-all px-2.5 py-2.5 rounded-lg hover:bg-white/5 text-xs whitespace-nowrap ${
+                  className={`relative font-semibold transition-all px-3 py-3 rounded-lg hover:bg-white/5 text-xs whitespace-nowrap ${
                     isExactActive ? 'text-white bg-white/5' : 'text-[var(--text-secondary)] hover:text-white'
                   } ${item.highlight ? 'text-[var(--accent-cyan)] hover:text-[var(--accent-cyan-light)]' : ''}`}
-                  style={{ letterSpacing: '0.02em' }}
+                  style={{ letterSpacing: '0.03em' }}
                 >
                   {t(language, item.key as any)}
                   {item.key === 'navAccount' && currentUser?.avatarUrl && (
@@ -169,7 +175,8 @@ export default function Navbar() {
       {/* Toast Notification */}
       {showToast && (
         <div className="fixed top-20 right-4 z-[200] animate-fade-in-up">
-          <div className="bg-[#0a0a0f]/95 backdrop-blur-md border border-[var(--accent-cyan)]/50 text-white px-5 py-3 rounded-xl shadow-[0_0_20px_rgba(0,255,255,0.2)] flex items-center gap-3">
+          <div style={{ background: 'var(--bg-card)', border: '1px solid var(--accent-cyan)', color: 'var(--text-primary)' }}
+            className="px-5 py-3 rounded-xl shadow-lg flex items-center gap-3">
             <CheckCircle2 className="text-[var(--accent-cyan)]" size={20} />
             <span className="font-medium text-sm">{t(language, 'logoutSuccess' as any)}</span>
           </div>

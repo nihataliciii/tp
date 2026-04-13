@@ -4,9 +4,9 @@ import { useApp, ThemeMode } from '@/lib/AppContext';
 import { Sun, Moon, Monitor } from 'lucide-react';
 
 const OPTIONS: { value: ThemeMode; icon: React.ElementType; label: string }[] = [
-  { value: 'light', icon: Sun,     label: 'Açık' },
-  { value: 'auto',  icon: Monitor, label: 'Otomatik' },
-  { value: 'dark',  icon: Moon,    label: 'Koyu' },
+  { value: 'light', icon: Sun, label: 'Açık' },
+  { value: 'auto', icon: Monitor, label: 'Otomatik' },
+  { value: 'dark', icon: Moon, label: 'Koyu' },
 ];
 
 export default function ThemeToggle() {

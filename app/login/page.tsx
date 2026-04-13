@@ -107,19 +107,19 @@ export default function LoginPage() {
   const isAuthMode = mode === 'login' || mode === 'signup';
 
   return (
-    <div className="relative min-h-[calc(100vh-64px)] w-full overflow-x-hidden flex justify-center items-center px-4 py-12">
-      <div className="orb orb-purple opacity-40 animate-float-slow" style={{ top: '10%', right: '10%', width: '40vw', height: '40vw' }} />
-      <div className="orb orb-cyan opacity-40 animate-float-slower" style={{ bottom: '20%', left: '5%', width: '30vw', height: '30vw' }} />
+    <div className="relative min-h-[calc(100vh-80px)] w-full overflow-x-hidden flex justify-center items-center px-4 py-10">
+      <div className="orb orb-purple opacity-15 fixed" style={{ top: '10%', right: '10%', width: '25vw', height: '25vw' }} />
+      <div className="orb orb-cyan opacity-15 fixed" style={{ bottom: '10%', left: '5%', width: '20vw', height: '20vw' }} />
 
       <div className="w-full max-w-md relative animate-fade-in-up">
         {/* Neon back glow */}
         <div className="absolute -inset-1 rounded-2xl bg-gradient-to-b from-[var(--accent-cyan)] to-[var(--accent-purple)] opacity-30 blur-2xl" />
         
-        <div className="glass-card p-8 md:p-10 relative z-20 shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-white/10 rounded-2xl bg-[#0a0a0f]/80">
+        <div className="glass-card p-7 md:p-9 relative z-20" style={{ border: '1px solid var(--border-accent)' }}>
           
           {/* Top Tabs (Only if Login or Signup) */}
           {isAuthMode && (
-            <div className="flex mb-8 p-1 rounded-xl bg-black/40 border border-white/5">
+            <div className="flex mb-6 p-1 rounded-xl" style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)' }}>
               {(['login', 'signup'] as const).map((m) => (
                 <button
                   key={m}
@@ -160,7 +160,7 @@ export default function LoginPage() {
                 <div className="relative group">
                   <User size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] group-focus-within:text-[var(--accent-cyan-light)] transition-colors" />
                   <input
-                    className="input-field bg-black/40 border-white/10 hover:border-white/20 focus:border-[var(--accent-cyan)] focus:bg-black/60 transition-all text-white placeholder-[var(--text-muted)] font-medium h-14"
+                    className="input-field font-medium"
                     style={{ paddingLeft: '3.5rem' }}
                     type="text"
                     placeholder={t(language, 'fullNamePlaceholder')}
@@ -171,7 +171,7 @@ export default function LoginPage() {
                 <div className="relative group">
                   <User size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] group-focus-within:text-[var(--accent-cyan-light)] transition-colors" />
                   <input
-                    className="input-field bg-black/40 border-white/10 hover:border-white/20 focus:border-[var(--accent-cyan)] focus:bg-black/60 transition-all text-white placeholder-[var(--text-muted)] font-medium h-14"
+                    className="input-field font-medium"
                     style={{ paddingLeft: '3.5rem' }}
                     type="text"
                     placeholder={t(language, 'usernamePlaceholder')}
@@ -182,7 +182,7 @@ export default function LoginPage() {
                 <div className="relative group">
                   <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] group-focus-within:text-[var(--accent-cyan-light)] transition-colors" />
                   <input
-                    className="input-field bg-black/40 border-white/10 hover:border-white/20 focus:border-[var(--accent-cyan)] focus:bg-black/60 transition-all text-white placeholder-[var(--text-muted)] font-medium h-14"
+                    className="input-field font-medium"
                     style={{ paddingLeft: '3.5rem' }}
                     type="email"
                     placeholder={t(language, 'emailPlaceholder')}
@@ -270,10 +270,10 @@ export default function LoginPage() {
             )}
 
             {/* SUBMIT BUTTON — separated with clear spacing from inputs */}
-            <div className="mt-8 pt-5 border-t border-white/10">
+            <div className="mt-6 pt-5" style={{ borderTop: '1px solid var(--border)' }}>
               <button
                 type="submit"
-                className="w-full relative overflow-hidden bg-white text-black font-bold text-base h-14 rounded-xl shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:shadow-[0_0_30px_rgba(255,255,255,0.4)] transition-all transform hover:-translate-y-1 disabled:opacity-70 disabled:hover:translate-y-0 disabled:hover:shadow-none animate-fade-in-up"
+                className="w-full btn-primary justify-center w-full disabled:opacity-60"
                 disabled={loading}
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-[var(--accent-cyan)] to-[var(--accent-purple-light)] opacity-0 hover:opacity-10 transition-opacity" />

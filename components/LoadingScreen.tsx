@@ -129,7 +129,7 @@ export default function LoadingScreen() {
             <div
               key={item.label}
               className="py-3 px-2 rounded-xl text-center"
-              style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid var(--border-accent)' }}
+              style={{ background: 'var(--bg-card)', border: '1px solid var(--border-accent)' }}
             >
               <p className="text-base font-bold gradient-text">{item.value}</p>
               <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{item.label}</p>

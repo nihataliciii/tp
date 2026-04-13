@@ -16,7 +16,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="flex flex-col min-h-[calc(100vh-64px)] bg-[#050508]">
+    <div className="flex flex-col w-full" style={{ background: 'var(--bg-primary)' }}>
       {/* Landing Hero Area */}
       <AuthScreen />
       
