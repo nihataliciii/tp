@@ -42,7 +42,11 @@ export default function LoginPage() {
     setLoading(true);
     const res = await login(identifier, password);
     if (!res.success) {
-      setError(t(language, res.error === 'user_not_found' ? 'userNotFound' : 'wrongPassword'));
+      if (res.error === 'email_not_confirmed') {
+        setError('E-posta adresinizi onaylamanız gerekiyor. Gelen kutunuzu kontrol edin.');
+      } else {
+        setError(t(language, res.error === 'user_not_found' ? 'userNotFound' : 'wrongPassword'));
+      }
       setLoading(false);
       return;
     }
