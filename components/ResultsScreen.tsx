@@ -174,6 +174,11 @@ export default function ResultsScreen() {
           ✓ Test sonucu kaydedildi
         </div>
       )}
+      {!currentUser && (
+        <div className="bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 p-3 rounded-xl text-sm text-center">
+          ⚠ Giriş yapılmadığı için sonuç kaydedilmedi
+        </div>
+      )}
       {/* Header */}
         <div className="text-center">
           <p className="text-base" style={{ color: 'var(--text-muted)' }}>
