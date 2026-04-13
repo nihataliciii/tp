@@ -70,7 +70,9 @@ export default function LoginPage() {
     setLoading(true);
     const res = await register(name, username, email, password);
     if (!res.success) {
-      setError(t(language, res.error === 'username_taken' ? 'usernameTaken' : 'emailTaken'));
+      if (res.error === 'username_taken') setError(t(language, 'usernameTaken'));
+      else if (res.error === 'email_taken') setError(t(language, 'emailTaken'));
+      else setError(res.error ?? 'Kayıt sırasında hata oluştu');
       setLoading(false);
       return;
     }
