@@ -24,7 +24,7 @@ export default function BlogPostDetail() {
   if (!post) {
     return (
       <div className="flex flex-col justify-center items-center min-h-[calc(100vh-64px)] p-6 text-center">
-        <h1 className="text-3xl text-slate-900 dark:text-white font-bold mb-4">Post bulunamadı.</h1>
+        <h1 className="text-3xl text-slate-800 dark:text-white font-bold mb-4">Post bulunamadı.</h1>
         <button onClick={() => router.push('/blog')} className="text-[var(--accent-cyan)] hover:underline flex items-center">
           <ChevronLeft size={16} /> Geri dön
         </button>

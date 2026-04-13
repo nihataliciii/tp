@@ -62,7 +62,7 @@ export default function Navbar() {
               <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white">
                 <Timer size={16} />
               </div>
-              <span className="text-sm font-bold tracking-wide uppercase text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+              <span className="text-sm font-bold tracking-wide uppercase text-slate-800 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                 TimePerception
               </span>
             </Link>
@@ -78,7 +78,7 @@ export default function Navbar() {
                     className={`relative font-semibold transition-all px-3 py-1.5 rounded-md text-sm whitespace-nowrap border-none bg-transparent ${
                       isExactActive 
                         ? 'text-indigo-600 dark:text-indigo-400' 
-                        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
+                        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-800 dark:hover:text-white'
                     } ${item.highlight && !isExactActive ? 'text-indigo-600 dark:text-indigo-400' : ''}`}
                   >
                     {t(language, item.key as any)}

@@ -19,11 +19,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="tr" suppressHydrationWarning>
       <head />
-      <body className="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-gray-100 min-h-screen">
+      <body className="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-gray-100 min-h-screen">
         <AppProvider>
           <Navbar />
-          {/* pt-24 (96px) ensures NO OVERLAPPING with the fixed 64px Navbar globally */}
-          <main className="pt-24 min-h-[calc(100vh-64px)] w-full max-w-7xl mx-auto px-4 flex flex-col items-center">
+          {/* pt-32 (128px) ensures NO OVERLAPPING with the fixed 64px Navbar globally */}
+          <main className="pt-32 min-h-[calc(100vh-64px)] w-full max-w-7xl mx-auto px-4 flex flex-col items-center">
             <div className="w-full flex-col flex items-center justify-center">
               {children}
             </div>

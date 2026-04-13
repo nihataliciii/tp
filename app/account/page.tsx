@@ -91,7 +91,7 @@ export default function AccountPage() {
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 flex-1 w-full shadow-sm">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h1 className="text-xl font-bold text-slate-900 dark:text-white">
+                <h1 className="text-xl font-bold text-slate-800 dark:text-white">
                   {currentUser.fullName}
                 </h1>
                 <p className="text-sm mt-0.5 flex items-center gap-1 text-indigo-600 dark:text-indigo-400 font-medium">
@@ -123,7 +123,7 @@ export default function AccountPage() {
         {/* ── Test history ── */}
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 flex flex-col gap-5 shadow-sm">
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-bold flex items-center gap-2 text-slate-900 dark:text-white">
+            <h2 className="text-base font-bold flex items-center gap-2 text-slate-800 dark:text-white">
               <Activity size={18} className="text-indigo-600 dark:text-indigo-400" />
               Test Geçmişi
             </h2>
@@ -135,7 +135,7 @@ export default function AccountPage() {
           {tests.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-800">
               <Brain size={36} className="mb-3 text-slate-300 dark:text-slate-600" />
-              <h3 className="text-sm font-bold mb-1 text-slate-900 dark:text-white">Henüz Bir Test Yapmadınız</h3>
+              <h3 className="text-sm font-bold mb-1 text-slate-800 dark:text-white">Henüz Bir Test Yapmadınız</h3>
               <p className="text-xs mb-5 max-w-xs text-slate-500 dark:text-slate-400">
                 Zaman algısı testini tamamladığında skorların burada görünür.
               </p>
@@ -166,7 +166,7 @@ export default function AccountPage() {
                     <LayoutDashboard size={13} className="text-indigo-500 dark:text-indigo-400" />
                     {test.testType}
                   </h4>
-                  <p className="text-base font-bold text-slate-900 dark:text-white">{test.scoreStr}</p>
+                  <p className="text-base font-bold text-slate-800 dark:text-white">{test.scoreStr}</p>
                 </div>
               ))}
             </div>

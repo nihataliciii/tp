@@ -53,7 +53,7 @@ export default function LanguageSelector() {
               }}
               className={`flex items-center gap-3 px-3 py-2 text-sm text-left rounded-md transition-colors border-none ${
                 language === lang.code 
-                  ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold' 
+                  ? 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-white font-semibold' 
                   : 'bg-transparent text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-slate-800'
               }`}
             >

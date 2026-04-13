@@ -146,7 +146,7 @@ export default function LoginPage() {
               >
                 <ArrowLeft size={16} /> {t(language, 'backToLogin')}
               </button>
-              <h2 className="text-2xl font-bold text-slate-900 dark:text-white gradient-text">{t(language, 'resetPassTitle')}</h2>
+              <h2 className="text-2xl font-bold text-slate-800 dark:text-white gradient-text">{t(language, 'resetPassTitle')}</h2>
             </div>
           )}
 
@@ -160,7 +160,7 @@ export default function LoginPage() {
                 <div className="relative group">
                   <User size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] group-focus-within:text-[var(--accent-cyan-light)] transition-colors" />
                   <input
-                    className="input-field bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-900 transition-all text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 font-medium h-14"
+                    className="input-field bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-900 transition-all text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 font-medium h-14"
                     style={{ paddingLeft: '3.5rem' }}
                     type="text"
                     placeholder={t(language, 'fullNamePlaceholder')}
@@ -171,7 +171,7 @@ export default function LoginPage() {
                 <div className="relative group">
                   <User size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] group-focus-within:text-[var(--accent-cyan-light)] transition-colors" />
                   <input
-                    className="input-field bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-900 transition-all text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 font-medium h-14"
+                    className="input-field bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-900 transition-all text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 font-medium h-14"
                     style={{ paddingLeft: '3.5rem' }}
                     type="text"
                     placeholder={t(language, 'usernamePlaceholder')}
@@ -182,7 +182,7 @@ export default function LoginPage() {
                 <div className="relative group">
                   <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] group-focus-within:text-[var(--accent-cyan-light)] transition-colors" />
                   <input
-                    className="input-field bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-900 transition-all text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 font-medium h-14"
+                    className="input-field bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-900 transition-all text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 font-medium h-14"
                     style={{ paddingLeft: '3.5rem' }}
                     type="email"
                     placeholder={t(language, 'emailPlaceholder')}

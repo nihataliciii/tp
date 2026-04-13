@@ -23,7 +23,7 @@ export default function ContactPage() {
             {isTR ? 'Bize Ulaşın' : 'Get in Touch'}
           </div>
           <h1
-            className="text-5xl md:text-7xl font-black text-slate-900 dark:text-white mb-6 uppercase"
+            className="text-5xl md:text-7xl font-black text-slate-800 dark:text-white mb-6 uppercase"
             style={{ fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: '0.05em' }}
           >
             {isTR ? 'İletişim' : 'Contact'}
@@ -47,7 +47,7 @@ export default function ContactPage() {
                 <Mail size={28} className="text-[var(--accent-purple-light)]" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-1">{isTR ? 'E-posta' : 'Email'}</h3>
+                <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-1">{isTR ? 'E-posta' : 'Email'}</h3>
                 <p className="text-[var(--text-secondary)] text-base mb-3">
                   {isTR ? 'Her türlü soru ve öneriniz için.' : 'For all your questions and suggestions.'}
                 </p>
@@ -64,7 +64,7 @@ export default function ContactPage() {
                 <Clock size={28} className="text-[var(--accent-cyan)]" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">{isTR ? 'Yanıt Süresi' : 'Response Time'}</h3>
+                <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-2">{isTR ? 'Yanıt Süresi' : 'Response Time'}</h3>
                 <p className="text-[var(--text-secondary)] text-base leading-relaxed">
                   {isTR ? 'Mesajlarınızı genellikle 24-48 saat içinde yanıtlıyoruz.' : 'We usually reply within 24-48 hours on business days.'}
                 </p>
@@ -81,7 +81,7 @@ export default function ContactPage() {
                 <MapPin size={28} className="text-pink-400" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">{isTR ? 'Konum' : 'Location'}</h3>
+                <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-2">{isTR ? 'Konum' : 'Location'}</h3>
                 <p className="text-[var(--text-secondary)] text-base leading-relaxed">
                   {isTR ? 'Türkiye merkezli, dünyaya açık bir proje.' : 'Turkey-based project, open to the world.'}
                 </p>
@@ -97,11 +97,11 @@ export default function ContactPage() {
               style={{ borderColor: 'rgba(124,58,237,0.3)', background: 'linear-gradient(135deg, rgba(124,58,237,0.08), rgba(6,182,212,0.05))' }}
             >
               <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[var(--accent-purple)] to-[var(--accent-cyan)] flex items-center justify-center shadow-[0_0_30px_rgba(124,58,237,0.4)]">
-                <Mail size={36} className="text-slate-900 dark:text-white" />
+                <Mail size={36} className="text-slate-800 dark:text-white" />
               </div>
               <div>
                 <h2
-                  className="text-3xl font-black text-slate-900 dark:text-white mb-3 uppercase"
+                  className="text-3xl font-black text-slate-800 dark:text-white mb-3 uppercase"
                   style={{ fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: '0.06em' }}
                 >
                   {isTR ? 'Mesaj Gönder' : 'Send a Message'}
@@ -114,7 +114,7 @@ export default function ContactPage() {
               </div>
               <a
                 href="mailto:hello@timeperception.app?subject=TimePerception%20Geribildirim&body=Merhaba%2C"
-                className="w-full inline-flex items-center justify-center gap-3 font-black text-xl py-6 px-8 rounded-2xl bg-gradient-to-r from-[var(--accent-purple)] to-[var(--accent-cyan)] text-slate-900 dark:text-white uppercase tracking-widest shadow-[0_0_25px_rgba(124,58,237,0.4)] hover:shadow-[0_0_40px_rgba(124,58,237,0.6)] hover:scale-[1.02] transition-all duration-300"
+                className="w-full inline-flex items-center justify-center gap-3 font-black text-xl py-6 px-8 rounded-2xl bg-gradient-to-r from-[var(--accent-purple)] to-[var(--accent-cyan)] text-white uppercase tracking-widest shadow-[0_0_25px_rgba(124,58,237,0.4)] hover:shadow-[0_0_40px_rgba(124,58,237,0.6)] hover:scale-[1.02] transition-all duration-300"
                 style={{ fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: '0.1em' }}
               >
                 <Mail size={24} />
@@ -134,7 +134,7 @@ export default function ContactPage() {
                 <MessageCircle size={28} className="text-[var(--accent-cyan)]" />
               </div>
               <div className="flex-1">
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-1">{isTR ? 'Topluluk Forumu' : 'Community Forum'}</h3>
+                <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-1">{isTR ? 'Topluluk Forumu' : 'Community Forum'}</h3>
                 <p className="text-[var(--text-secondary)] text-base">
                   {isTR ? 'Diğer kullanıcılarla tartış, deneyimlerini paylaş.' : 'Discuss with other users, share your experiences.'}
                 </p>
