@@ -10,7 +10,6 @@ import { t } from '@/lib/i18n';
 import LanguageSelector from './LanguageSelector';
 import ThemeToggle from './ThemeToggle';
 
-
 export default function Navbar() {
   const { language } = useApp();
   const { currentUser, logout } = useAuthStore();
@@ -53,135 +52,125 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-[100] border-b border-[var(--border-accent)] bg-black/60 backdrop-blur-md">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center h-16 gap-4">
-          {/* Left: Logo */}
-          <Link href="/" className="flex items-center gap-3 shrink-0 mr-4" onClick={handleLinkClick}>
-            {/* Logo Placeholder */}
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[var(--accent-purple)] to-[var(--accent-cyan)] flex items-center justify-center shadow-[0_0_12px_var(--glow-purple)]">
-              <Timer size={18} className="text-white" />
-            </div>
-            <span
-              className="text-sm font-bold tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent-purple-light)] to-[var(--accent-cyan)] uppercase"
-              style={{ fontFamily: "'Formula1', 'Inter Tight', sans-serif", letterSpacing: '0.08em' }}
-            >
-              TimePerception
-            </span>
-          </Link>
+    <>
+      <nav className="fixed top-0 left-0 right-0 z-[100] border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-950/90 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto px-4 w-full">
+          <div className="flex items-center h-16 gap-4">
+            
+            {/* Left: Logo */}
+            <Link href="/" className="flex items-center gap-2 shrink-0 mr-4 group" onClick={handleLinkClick}>
+              <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white">
+                <Timer size={16} />
+              </div>
+              <span className="text-sm font-bold tracking-wide uppercase text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                TimePerception
+              </span>
+            </Link>
 
-          {/* Center: Nav Links (desktop) — overflow-x-auto so they never wrap */}
-          <div
-            className="hidden lg:flex flex-1 items-center justify-center gap-3"
-            style={{ overflowX: 'auto', scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-          >
+            {/* Center: Nav Links (desktop) */}
+            <div className="hidden lg:flex flex-1 items-center justify-center gap-1 overflow-x-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+              {navItems.map((item) => {
+                const isExactActive = pathname === item.href;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`relative font-semibold transition-all px-3 py-1.5 rounded-md text-sm whitespace-nowrap border-none bg-transparent ${
+                      isExactActive 
+                        ? 'text-indigo-600 dark:text-indigo-400' 
+                        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
+                    } ${item.highlight && !isExactActive ? 'text-indigo-600 dark:text-indigo-400' : ''}`}
+                  >
+                    {t(language, item.key as any)}
+                    {item.key === 'navAccount' && currentUser?.avatarUrl && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={currentUser.avatarUrl} alt="Avatar" className="ml-1 w-5 h-5 rounded-full inline-block object-cover align-middle border border-slate-200 dark:border-slate-700" />
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+
+            {/* Right: Actions */}
+            <div className="hidden lg:flex items-center gap-1 ml-auto shrink-0">
+              <ThemeToggle />
+              <LanguageSelector />
+              {(mounted && currentUser) && (
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors text-sm font-semibold px-3 py-1.5 rounded-md border-none ml-1"
+                >
+                  <LogOut size={16} />
+                  <span>{t(language, 'logoutNav' as any)}</span>
+                </button>
+              )}
+            </div>
+
+            {/* Mobile menu button */}
+            <div className="flex items-center gap-2 lg:hidden ml-auto z-[101]">
+              <LanguageSelector />
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md p-1.5 transition-colors border-none"
+                aria-label="Toggle menu"
+              >
+                {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Mobile Menu Backdrop (fully covers page to prevent overlapping) */}
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 z-[90] bg-white dark:bg-slate-950 lg:hidden overflow-y-auto pt-16">
+          <div className="px-4 py-6 flex flex-col gap-1">
             {navItems.map((item) => {
               const isExactActive = pathname === item.href;
-              
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`relative font-semibold transition-all px-3 py-3 rounded-lg hover:bg-white/5 text-xs whitespace-nowrap ${
-                    isExactActive ? 'text-white bg-white/5' : 'text-[var(--text-secondary)] hover:text-white'
-                  } ${item.highlight ? 'text-[var(--accent-cyan)] hover:text-[var(--accent-cyan-light)]' : ''}`}
-                  style={{ letterSpacing: '0.03em' }}
+                  onClick={handleLinkClick}
+                  className={`px-4 py-3 rounded-lg text-base font-semibold transition-all flex items-center border-none ${
+                    isExactActive
+                      ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400'
+                      : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                  } ${item.highlight && !isExactActive ? 'text-indigo-600 dark:text-indigo-400' : ''}`}
                 >
                   {t(language, item.key as any)}
                   {item.key === 'navAccount' && currentUser?.avatarUrl && (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={currentUser.avatarUrl} alt="Avatar" className="ml-1 w-5 h-5 rounded-full inline-block object-cover align-middle border border-[var(--accent-purple-light)]" />
-                  )}
-                  {isExactActive && (
-                    <span className="absolute bottom-0 left-2 right-2 h-0.5 bg-gradient-to-r from-[var(--accent-purple-light)] to-[var(--accent-cyan)] rounded-full" />
+                    <img src={currentUser.avatarUrl} alt="Avatar" className="ml-2 w-6 h-6 rounded-full inline-block object-cover border border-slate-200 dark:border-slate-700" />
                   )}
                 </Link>
               );
             })}
-          </div>
-
-          {/* Right: Actions */}
-          <div className="hidden lg:flex items-center gap-3 ml-auto shrink-0">
-            <ThemeToggle />
-            {(mounted && currentUser) && (
-              <button
-                onClick={handleLogout}
-                className="flex items-center gap-2 text-[var(--accent-purple-light)] hover:text-white transition-colors text-sm font-semibold border border-[var(--border-accent)] px-4 py-2.5 rounded-lg hover:bg-[rgba(124,58,237,0.1)] min-h-[44px]"
-              >
-                <LogOut size={16} />
-                {t(language, 'logoutNav' as any)}
-              </button>
-            )}
-            <div className="pl-3 border-l border-[var(--border-accent)]">
-              <LanguageSelector />
+            <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-800 flex justify-between items-center px-2">
+              <ThemeToggle />
+              {(mounted && currentUser) && (
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-base font-semibold text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors border-none"
+                >
+                  <LogOut size={18} />
+                  {t(language, 'logoutNav' as any)}
+                </button>
+              )}
             </div>
           </div>
-
-          {/* Mobile menu button */}
-          <div className="flex items-center gap-4 lg:hidden ml-auto">
-            <LanguageSelector />
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="text-[var(--text-primary)] hover:text-white transition-colors p-2"
-              aria-label="Toggle menu"
-            >
-              {mobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
-            </button>
-          </div>
         </div>
-      </div>
-
-      {/* Mobile Menu Dropdown */}
-      <div
-        className={`lg:hidden transition-all duration-300 ease-in-out overflow-hidden bg-[rgba(15,15,26,0.95)] backdrop-blur-xl border-b border-[var(--border-accent)] ${
-          mobileMenuOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
-        }`}
-      >
-        <div className="px-4 pt-2 pb-6 space-y-1 flex flex-col">
-          {navItems.map((item) => {
-            const isExactActive = pathname === item.href;
-
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={handleLinkClick}
-                className={`block px-4 py-4 rounded-xl text-base font-semibold transition-all min-h-[52px] flex items-center ${
-                  isExactActive
-                    ? 'bg-[rgba(124,58,237,0.15)] text-[var(--accent-cyan-light)]'
-                    : 'text-[var(--text-primary)] hover:bg-[rgba(255,255,255,0.05)] hover:text-white'
-                } ${item.highlight && !isExactActive ? 'text-[var(--accent-cyan)]' : ''}`}
-              >
-                {t(language, item.key as any)}
-                {item.key === 'navAccount' && currentUser?.avatarUrl && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={currentUser.avatarUrl} alt="Avatar" className="ml-2 w-6 h-6 rounded-full inline-block object-cover border border-[var(--accent-cyan)]" />
-                )}
-              </Link>
-            );
-          })}
-          {(mounted && currentUser) && (
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-4 w-full text-left rounded-xl text-base font-semibold text-red-400 hover:bg-red-500/10 transition-colors mt-2 min-h-[52px]"
-            >
-              <LogOut size={20} />
-              {t(language, 'logoutNav' as any)}
-            </button>
-          )}
-        </div>
-      </div>
+      )}
       
       {/* Toast Notification */}
       {showToast && (
         <div className="fixed top-20 right-4 z-[200] animate-fade-in-up">
-          <div style={{ background: 'var(--bg-card)', border: '1px solid var(--accent-cyan)', color: 'var(--text-primary)' }}
-            className="px-5 py-3 rounded-xl shadow-lg flex items-center gap-3">
-            <CheckCircle2 className="text-[var(--accent-cyan)]" size={20} />
+          <div className="bg-white dark:bg-slate-900 border border-indigo-200 dark:border-indigo-800 text-slate-800 dark:text-white px-4 py-3 rounded-lg shadow-xl flex items-center gap-3">
+            <CheckCircle2 className="text-indigo-600 dark:text-indigo-400" size={18} />
             <span className="font-medium text-sm">{t(language, 'logoutSuccess' as any)}</span>
           </div>
         </div>
       )}
-    </nav>
+    </>
   );
 }

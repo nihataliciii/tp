@@ -35,16 +35,15 @@ export default function LanguageSelector() {
     <div className="relative z-50 animate-fade-in-up" ref={dropdownRef}>
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 rounded-xl glass-card text-sm font-medium transition-all hover:bg-[rgba(26,26,46,0.9)]"
-        style={{ color: 'var(--text-primary)', border: '1px solid var(--border-accent)' }}
+        className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-transparent border-none text-slate-800 dark:text-gray-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-sm font-medium"
       >
-        <Globe size={16} style={{ color: 'var(--accent-cyan)' }} />
+        <Globe size={16} className="text-slate-600 dark:text-slate-400" />
         <span>{currentLang.flag}</span>
         <span className="hidden sm:inline-block">{currentLang.label}</span>
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full mt-2 w-40 glass-card p-2 shadow-2xl overflow-hidden rounded-xl border border-[var(--border-accent)] flex flex-col gap-1">
+        <div className="absolute right-0 top-full mt-2 w-40 p-1 shadow-lg overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col gap-1">
           {languages.map((lang) => (
             <button
               key={lang.code}
@@ -52,14 +51,14 @@ export default function LanguageSelector() {
                 setLanguage(lang.code);
                 setIsOpen(false);
               }}
-              className="flex items-center gap-3 px-3 py-2 text-sm text-left rounded-lg transition-colors hover:bg-[rgba(124,58,237,0.15)]"
-              style={{
-                color: language === lang.code ? 'var(--accent-cyan-light)' : 'var(--text-primary)',
-                background: language === lang.code ? 'rgba(124,58,237,0.2)' : 'transparent',
-              }}
+              className={`flex items-center gap-3 px-3 py-2 text-sm text-left rounded-md transition-colors border-none ${
+                language === lang.code 
+                  ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold' 
+                  : 'bg-transparent text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+              }`}
             >
               <span className="text-lg">{lang.flag}</span>
-              <span className="font-medium">{lang.label}</span>
+              <span>{lang.label}</span>
             </button>
           ))}
         </div>
