@@ -25,7 +25,7 @@ export default function Home() {
         <div className="w-full relative z-20 pb-20">
           <div className="max-w-5xl mx-auto px-6">
             <div className="flex items-center justify-between mb-8 border-b border-white/10 pb-4">
-              <h2 className="text-2xl md:text-3xl font-bold font-space text-transparent bg-clip-text bg-gradient-to-r from-white to-[var(--accent-purple-light)]">
+              <h2 className="text-2xl md:text-3xl font-bold font-space text-transparent bg-clip-text bg-gradient-to-r from-slate-900 dark:from-white to-[var(--accent-purple-light)]">
                 Son Yazılarımız
               </h2>
               <Link href="/blog" className="text-sm font-semibold text-[var(--accent-cyan)] flex items-center gap-1 hover:text-[var(--accent-cyan-light)] transition-colors">

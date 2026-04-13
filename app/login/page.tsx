@@ -146,7 +146,7 @@ export default function LoginPage() {
               >
                 <ArrowLeft size={16} /> {t(language, 'backToLogin')}
               </button>
-              <h2 className="text-2xl font-bold text-white gradient-text">{t(language, 'resetPassTitle')}</h2>
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white gradient-text">{t(language, 'resetPassTitle')}</h2>
             </div>
           )}
 
@@ -160,7 +160,7 @@ export default function LoginPage() {
                 <div className="relative group">
                   <User size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] group-focus-within:text-[var(--accent-cyan-light)] transition-colors" />
                   <input
-                    className="input-field font-medium"
+                    className="input-field bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-900 transition-all text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 font-medium h-14"
                     style={{ paddingLeft: '3.5rem' }}
                     type="text"
                     placeholder={t(language, 'fullNamePlaceholder')}
@@ -171,7 +171,7 @@ export default function LoginPage() {
                 <div className="relative group">
                   <User size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] group-focus-within:text-[var(--accent-cyan-light)] transition-colors" />
                   <input
-                    className="input-field font-medium"
+                    className="input-field bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-900 transition-all text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 font-medium h-14"
                     style={{ paddingLeft: '3.5rem' }}
                     type="text"
                     placeholder={t(language, 'usernamePlaceholder')}
@@ -182,7 +182,7 @@ export default function LoginPage() {
                 <div className="relative group">
                   <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] group-focus-within:text-[var(--accent-cyan-light)] transition-colors" />
                   <input
-                    className="input-field font-medium"
+                    className="input-field bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-900 transition-all text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 font-medium h-14"
                     style={{ paddingLeft: '3.5rem' }}
                     type="email"
                     placeholder={t(language, 'emailPlaceholder')}
@@ -239,7 +239,7 @@ export default function LoginPage() {
                   <button
                     type="button"
                     onClick={() => setShowPass(!showPass)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-white transition-colors p-1"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-800 dark:text-slate-500 dark:hover:text-white transition-colors p-1"
                   >
                     {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
@@ -248,7 +248,7 @@ export default function LoginPage() {
                   <button 
                     type="button"
                     onClick={() => handleModeSwitch('forgot_password')} 
-                    className="text-xs font-semibold text-[var(--accent-cyan)] hover:text-white mt-3 transition-colors underline underline-offset-4 decoration-white/20"
+                    className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-white mt-3 transition-colors underline underline-offset-4 decoration-indigo-200 dark:decoration-white/20"
                   >
                     {t(language, 'forgotPassword')}
                   </button>
