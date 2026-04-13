@@ -186,7 +186,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   addTestResult: async (userId, result) => {
     const supabase = createClient();
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('test_results')
       .insert({
         user_id: userId,
@@ -197,6 +197,11 @@ export const useAuthStore = create<AuthState>((set) => ({
       })
       .select()
       .single();
+
+    if (error) {
+      console.error('addTestResult error:', error.message, error.details, error.code);
+      return;
+    }
 
     if (data) {
       const newResult: TestResult = {
