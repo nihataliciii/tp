@@ -14,18 +14,19 @@ import Link from 'next/link';
 export default function AccountPage() {
   const router = useRouter();
   const { language } = useApp();
-  const { currentUser, logout, updateUser } = useAuthStore();
+  const { currentUser, loading, logout, updateUser, fetchTestResults } = useAuthStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [uploading, setUploading] = useState(false);
-  const [mounted, setMounted] = useState(false);
 
-  useEffect(() => { setMounted(true); }, []);
   useEffect(() => {
-    if (mounted && !currentUser) router.push('/login');
-  }, [currentUser, router, mounted]);
+    if (!loading && !currentUser) router.push('/login');
+    if (!loading && currentUser && currentUser.testResults === undefined) {
+      fetchTestResults(currentUser.id);
+    }
+  }, [currentUser, loading, router, fetchTestResults]);
 
-  if (!mounted || !currentUser) {
+  if (loading || !currentUser) {
     return (
       <div className="w-full flex items-center justify-center min-h-[50vh]">
         <div className="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
@@ -33,7 +34,10 @@ export default function AccountPage() {
     );
   }
 
-  const handleLogout = () => { logout(); router.push('/'); };
+  const handleLogout = async () => {
+    await logout();
+    router.push('/');
+  };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

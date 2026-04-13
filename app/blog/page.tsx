@@ -75,7 +75,7 @@ export default function BlogList() {
                   <div className="flex items-center justify-between pt-2 border-t" style={{ borderColor: 'var(--border)' }}>
                     <span className="flex items-center gap-1 text-xs" style={{ color: 'var(--text-muted)' }}>
                       <Calendar size={12} />
-                      {new Date(post.createdAt || Date.now()).toLocaleDateString()}
+                      {new Date(post.date || Date.now()).toLocaleDateString()}
                     </span>
                     <ChevronRight size={14} style={{ color: 'var(--accent-cyan)' }} />
                   </div>
