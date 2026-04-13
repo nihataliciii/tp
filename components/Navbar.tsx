@@ -40,8 +40,8 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [lastScrollY]);
   
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     setMobileMenuOpen(false);
     setShowToast(true);
     setTimeout(() => setShowToast(false), 3000);
@@ -73,7 +73,7 @@ export default function Navbar() {
       <nav className={`fixed top-0 left-0 right-0 z-[100] transition-transform duration-300 border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-950/90 backdrop-blur-md ${isVisible ? 'translate-y-0' : '-translate-y-full'}`}>
         <div className="max-w-7xl mx-auto px-4 w-full">
           <div className="flex items-center h-16 gap-4">
-            
+
             {/* Left: Logo */}
             <Link href="/" className="flex items-center gap-2 shrink-0 mr-4 group" onClick={handleLinkClick}>
               <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white">

@@ -38,17 +38,15 @@ export default function LoginPage() {
     e.preventDefault();
     setError('');
     if (!identifier || !password) { setError(t(language, 'fillFields')); return; }
-    
+
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 800)); // simulate network delay
-    
-    const res = login(identifier, password);
+    const res = await login(identifier, password);
     if (!res.success) {
       setError(t(language, res.error === 'user_not_found' ? 'userNotFound' : 'wrongPassword'));
       setLoading(false);
       return;
     }
-    
+
     setUser({ name: res.user!.fullName, email: res.user!.email });
     setStage('survey');
     router.push('/');
@@ -66,17 +64,15 @@ export default function LoginPage() {
     }
     
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 800)); // simulate network delay
-    
-    const res = register(name, username, email, password);
+    const res = await register(name, username, email, password);
     if (!res.success) {
       setError(t(language, res.error === 'username_taken' ? 'usernameTaken' : 'emailTaken'));
       setLoading(false);
       return;
     }
-    
+
     // Auto-login after signup
-    const loginRes = login(username, password);
+    const loginRes = await login(email, password);
     if (loginRes.success) {
       setUser({ name: loginRes.user!.fullName, email: loginRes.user!.email });
       setStage('survey');
@@ -91,17 +87,10 @@ export default function LoginPage() {
     if (!email) { setError(t(language, 'fillFields')); return; }
     
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 1000));
-    
-    const res = resetPassword(email);
+    await resetPassword(email);
     setLoading(false);
-    
-    if (!res.success) {
-      setError(t(language, 'userNotFound'));
-    } else {
-      setSuccessMsg(t(language, 'resetPassSuccess'));
-      setEmail(''); // clear field
-    }
+    setSuccessMsg(t(language, 'resetPassSuccess'));
+    setEmail('');
   };
 
   const isAuthMode = mode === 'login' || mode === 'signup';

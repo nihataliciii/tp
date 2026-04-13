@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { AppProvider } from '@/lib/AppContext';
+import { AuthProvider } from '@/lib/AuthProvider';
 import Navbar from '@/components/Navbar';
 
 export const metadata: Metadata = {
@@ -21,13 +22,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head />
       <body className="bg-slate-50 dark:bg-slate-950 text-slate-700 dark:text-gray-100 min-h-screen">
         <AppProvider>
-          <Navbar />
-          {/* pt-32 (128px) ensures NO OVERLAPPING with the fixed 64px Navbar globally */}
-          <main className="pt-32 min-h-[calc(100vh-64px)] w-full max-w-7xl mx-auto px-4 flex flex-col items-center">
-            <div className="w-full flex-col flex items-center justify-center">
-              {children}
-            </div>
-          </main>
+          <AuthProvider>
+            <Navbar />
+            <main className="pt-32 min-h-[calc(100vh-64px)] w-full max-w-7xl mx-auto px-4 flex flex-col items-center">
+              <div className="w-full flex-col flex items-center justify-center">
+                {children}
+              </div>
+            </main>
+          </AuthProvider>
         </AppProvider>
       </body>
     </html>
