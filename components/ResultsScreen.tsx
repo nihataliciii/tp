@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useEffect, useRef } from 'react';
+import { useMemo, useEffect, useRef, useState } from 'react';
 import { useApp } from '@/lib/AppContext';
 import { useAuthStore } from '@/lib/useAuthStore';
 import { t, Language } from '@/lib/i18n';
@@ -130,19 +130,21 @@ export default function ResultsScreen() {
   const analysis = useMemo(() => analyzeResults(roundResults, tpr, language), [roundResults, tpr, language]);
 
   const savedRef = useRef(false);
-  
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [saved, setSaved] = useState(false);
+
   useEffect(() => {
     if (currentUser && roundResults.length > 0 && !savedRef.current) {
       savedRef.current = true;
-      const statusStr = analysis.profileCategory === 'overperform' ? 'Yavaş Algı' 
+      const statusStr = analysis.profileCategory === 'overperform' ? 'Yavaş Algı'
                       : analysis.profileCategory === 'underperform' ? 'Hızlı Algı' : 'Normal Algı';
-                      
+
       addTestResult(currentUser.id, {
         date: new Date().toISOString(),
         testType: 'Zaman Algısı Testi',
         scoreStr: `${analysis.actualMeanRatio.toFixed(2)}x Oran | ${(tpr * 100).toFixed(0)} Skor`,
         status: statusStr
-      });
+      }).then(() => setSaved(true)).catch((e) => setSaveError(String(e)));
     }
   }, [currentUser, roundResults, analysis, tpr, addTestResult]);
 
@@ -162,6 +164,16 @@ export default function ResultsScreen() {
 
   return (
     <div className="w-full max-w-4xl flex flex-col gap-8 mx-auto relative z-10">
+      {saveError && (
+        <div className="bg-red-500/10 border border-red-500/30 text-red-400 p-3 rounded-xl text-sm text-center">
+          Kayıt hatası: {saveError}
+        </div>
+      )}
+      {saved && (
+        <div className="bg-green-500/10 border border-green-500/30 text-green-400 p-3 rounded-xl text-sm text-center">
+          ✓ Test sonucu kaydedildi
+        </div>
+      )}
       {/* Header */}
         <div className="text-center">
           <p className="text-base" style={{ color: 'var(--text-muted)' }}>

@@ -199,8 +199,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       .single();
 
     if (error) {
-      console.error('addTestResult error:', error.message, error.details, error.code);
-      return;
+      throw new Error(error.message);
     }
 
     if (data) {
