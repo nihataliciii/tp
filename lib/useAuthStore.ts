@@ -127,9 +127,9 @@ export const useAuthStore = create<AuthState>((set) => ({
     const { data, error } = await supabase.auth.signInWithPassword({ email, password: rawPass });
 
     if (error || !data.user) {
-      if (error?.message?.toLowerCase().includes('invalid')) {
-        return { success: false, error: 'wrong_password' };
-      }
+      const msg = error?.message?.toLowerCase() ?? '';
+      if (msg.includes('invalid')) return { success: false, error: 'wrong_password' };
+      if (msg.includes('not confirmed') || msg.includes('confirm')) return { success: false, error: 'email_not_confirmed' };
       return { success: false, error: 'user_not_found' };
     }
 
@@ -186,7 +186,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   addTestResult: async (userId, result) => {
     const supabase = createClient();
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('test_results')
       .insert({
         user_id: userId,
@@ -197,6 +197,10 @@ export const useAuthStore = create<AuthState>((set) => ({
       })
       .select()
       .single();
+
+    if (error) {
+      throw new Error(error.message);
+    }
 
     if (data) {
       const newResult: TestResult = {
