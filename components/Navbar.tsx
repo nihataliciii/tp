@@ -18,10 +18,27 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
   
   React.useEffect(() => {
     setMounted(true);
-  }, []);
+    
+    const handleScroll = () => {
+      if (typeof window !== 'undefined') {
+        const currentScrollY = window.scrollY;
+        if (currentScrollY > lastScrollY && currentScrollY > 100) {
+          setIsVisible(false);
+        } else if (currentScrollY < lastScrollY) {
+          setIsVisible(true);
+        }
+        setLastScrollY(currentScrollY);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
   
   const handleLogout = () => {
     logout();
@@ -53,7 +70,7 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="fixed top-0 left-0 right-0 z-[100] border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-950/90 backdrop-blur-md">
+      <nav className={`fixed top-0 left-0 right-0 z-[100] transition-transform duration-300 border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-950/90 backdrop-blur-md ${isVisible ? 'translate-y-0' : '-translate-y-full'}`}>
         <div className="max-w-7xl mx-auto px-4 w-full">
           <div className="flex items-center h-16 gap-4">
             
@@ -62,13 +79,13 @@ export default function Navbar() {
               <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white">
                 <Timer size={16} />
               </div>
-              <span className="text-sm font-bold tracking-wide uppercase text-slate-800 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+              <span className="text-sm font-bold tracking-wide uppercase text-slate-700 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                 TimePerception
               </span>
             </Link>
 
             {/* Center: Nav Links (desktop) */}
-            <div className="hidden lg:flex flex-1 items-center justify-center gap-1 overflow-x-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            <div className="hidden lg:flex flex-1 items-center justify-center gap-6 xl:gap-10 px-8 overflow-x-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
               {navItems.map((item) => {
                 const isExactActive = pathname === item.href;
                 return (
@@ -78,7 +95,7 @@ export default function Navbar() {
                     className={`relative font-semibold transition-all px-3 py-1.5 rounded-md text-sm whitespace-nowrap border-none bg-transparent ${
                       isExactActive 
                         ? 'text-indigo-600 dark:text-indigo-400' 
-                        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-800 dark:hover:text-white'
+                        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-white'
                     } ${item.highlight && !isExactActive ? 'text-indigo-600 dark:text-indigo-400' : ''}`}
                   >
                     {t(language, item.key as any)}
@@ -165,7 +182,7 @@ export default function Navbar() {
       {/* Toast Notification */}
       {showToast && (
         <div className="fixed top-20 right-4 z-[200] animate-fade-in-up">
-          <div className="bg-white dark:bg-slate-900 border border-indigo-200 dark:border-indigo-800 text-slate-800 dark:text-white px-4 py-3 rounded-lg shadow-xl flex items-center gap-3">
+          <div className="bg-white dark:bg-slate-900 border border-indigo-200 dark:border-indigo-800 text-slate-700 dark:text-white px-4 py-3 rounded-lg shadow-xl flex items-center gap-3">
             <CheckCircle2 className="text-indigo-600 dark:text-indigo-400" size={18} />
             <span className="font-medium text-sm">{t(language, 'logoutSuccess' as any)}</span>
           </div>

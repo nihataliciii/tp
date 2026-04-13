@@ -131,7 +131,7 @@ export default function ForumPage() {
                 {isTR ? 'Topluluk' : 'Community'}
               </div>
               <h1
-                className="text-5xl md:text-6xl font-black text-slate-800 dark:text-white uppercase"
+                className="text-5xl md:text-6xl font-black text-slate-700 dark:text-white uppercase"
                 style={{ fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: '0.05em' }}
               >
                 {isTR ? 'Forum' : 'Forum'}
@@ -151,7 +151,7 @@ export default function ForumPage() {
                 { icon: Heart, label: isTR ? 'Beğeni' : 'Likes', value: '8.9K' },
               ].map((stat) => (
                 <div key={stat.label} className="text-center">
-                  <p className="text-3xl font-black text-slate-800 dark:text-white" style={{ fontFamily: "'Barlow Condensed', sans-serif" }}>{stat.value}</p>
+                  <p className="text-3xl font-black text-slate-700 dark:text-white" style={{ fontFamily: "'Barlow Condensed', sans-serif" }}>{stat.value}</p>
                   <p className="text-sm text-[var(--text-muted)] font-medium">{stat.label}</p>
                 </div>
               ))}
@@ -168,7 +168,7 @@ export default function ForumPage() {
             <Clock size={20} className="text-[var(--accent-purple-light)]" />
           </div>
           <div className="flex-1">
-            <p className="font-bold text-slate-800 dark:text-white text-base">{isTR ? 'Forum Yakında Açılıyor' : 'Forum Coming Soon'}</p>
+            <p className="font-bold text-slate-700 dark:text-white text-base">{isTR ? 'Forum Yakında Açılıyor' : 'Forum Coming Soon'}</p>
             <p className="text-[var(--text-secondary)] text-sm mt-0.5">
               {isTR
                 ? 'Şu an gösterilen veriler önizleme amaçlıdır. Gerçek konu oluşturma yakında aktif olacak.'
@@ -260,7 +260,7 @@ export default function ForumPage() {
                         </span>
                       </div>
 
-                      <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-2 leading-snug">
+                      <h3 className="text-lg font-bold text-slate-700 dark:text-white mb-2 leading-snug">
                         {isTR ? thread.title : thread.titleEn}
                       </h3>
                       <p className="text-[var(--text-secondary)] text-sm mb-4 line-clamp-1">
@@ -290,7 +290,7 @@ export default function ForumPage() {
           <div className="w-full lg:w-72 shrink-0 flex flex-col gap-5">
             {/* Trending */}
             <div className="glass-card p-6">
-              <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
+              <h3 className="text-lg font-bold text-slate-700 dark:text-white mb-4 flex items-center gap-2">
                 <Flame size={18} className="text-orange-400" />
                 {isTR ? 'Popüler Konular' : 'Trending'}
               </h3>
@@ -315,7 +315,7 @@ export default function ForumPage() {
                 style={{ background: 'linear-gradient(135deg, rgba(124,58,237,0.1), rgba(6,182,212,0.05))' }}
               >
                 <Users size={32} className="text-[var(--accent-purple-light)] mx-auto mb-3" />
-                <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-2">
+                <h3 className="text-lg font-bold text-slate-700 dark:text-white mb-2">
                   {isTR ? 'Topluluğa Katıl' : 'Join the Community'}
                 </h3>
                 <p className="text-sm text-[var(--text-secondary)] mb-4">

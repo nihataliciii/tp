@@ -42,7 +42,7 @@ export default function ThemeToggle() {
             aria-pressed={isActive}
             className={`flex items-center justify-center w-8 h-8 rounded-md transition-all duration-200 border-none ${
               isActive
-                ? 'bg-slate-200 text-slate-800 dark:bg-slate-700 dark:text-white shadow-sm'
+                ? 'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-white shadow-sm'
                 : 'bg-transparent text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
           >

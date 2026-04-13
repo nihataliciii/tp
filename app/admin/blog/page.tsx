@@ -136,7 +136,7 @@ export default function AdminBlogPage() {
     <div className="min-h-[calc(100vh-64px)] w-full p-6 lg:p-12 relative">
       <div className="max-w-6xl mx-auto space-y-12">
         <header className="flex justify-between items-center mb-8 border-b border-[var(--border-accent)] pb-6">
-          <h1 className="text-3xl font-bold text-slate-800 dark:text-white flex items-center gap-3">
+          <h1 className="text-3xl font-bold text-slate-700 dark:text-white flex items-center gap-3">
             <FileEdit className="text-[var(--accent-purple)]" /> 
             {t(language, 'adminPanel')}
           </h1>
@@ -145,7 +145,7 @@ export default function AdminBlogPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Create Form */}
           <div className="lg:col-span-1 glass-card p-6 h-fit sticky top-24">
-            <h2 className="text-xl font-semibold text-slate-800 dark:text-white mb-6 flex items-center gap-2">
+            <h2 className="text-xl font-semibold text-slate-700 dark:text-white mb-6 flex items-center gap-2">
               <PlusCircle size={20} className="text-[var(--accent-cyan)]" />
               {t(language, 'newPost')}
             </h2>
@@ -255,7 +255,7 @@ export default function AdminBlogPage() {
 
           {/* Posts List */}
           <div className="lg:col-span-2 space-y-4">
-            <h2 className="text-xl font-semibold text-slate-800 dark:text-white mb-6">Mevcut Yazılar ({posts.length})</h2>
+            <h2 className="text-xl font-semibold text-slate-700 dark:text-white mb-6">Mevcut Yazılar ({posts.length})</h2>
             {posts.length === 0 ? (
               <p className="text-[var(--text-muted)]">Burada henüz hiç yazı yok.</p>
             ) : (
@@ -264,7 +264,7 @@ export default function AdminBlogPage() {
                   <div className="flex items-center gap-4 flex-1">
                     <img src={post.imageUrl} alt="" className="w-16 h-16 rounded-lg object-cover" />
                     <div>
-                      <h3 className="font-bold text-slate-800 dark:text-white text-lg line-clamp-1">{post.title}</h3>
+                      <h3 className="font-bold text-slate-700 dark:text-white text-lg line-clamp-1">{post.title}</h3>
                       <div className="flex gap-3 text-xs text-[var(--text-muted)] font-medium mt-1">
                         <span className="text-[var(--accent-cyan)]">{post.category}</span>
                         <span>•</span>

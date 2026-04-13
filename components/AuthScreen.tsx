@@ -20,7 +20,7 @@ export default function AuthScreen() {
   };
 
   return (
-    <div className="relative min-h-screen w-full overflow-x-hidden flex items-center"
+    <div className="relative min-h-screen w-full overflow-x-hidden flex items-center justify-center"
       style={{ background: 'var(--bg-primary)' }}>
 
       {/* ── Background ── */}

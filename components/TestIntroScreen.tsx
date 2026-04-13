@@ -48,7 +48,7 @@ export default function TestIntroScreen() {
           {language === 'tr' ? 'Teste Hazır mısın?' : 'Ready for the Test?'}
         </div>
         <h1
-          className="text-5xl md:text-6xl font-black text-slate-800 dark:text-white mb-4 uppercase"
+          className="text-5xl md:text-6xl font-black text-slate-700 dark:text-white mb-4 uppercase"
           style={{ fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: '0.05em' }}
         >
           {language === 'tr' ? 'Zaman Algısı Testi' : 'Time Perception Test'}
@@ -84,7 +84,7 @@ export default function TestIntroScreen() {
                     {language === 'tr' ? `Aşama ${i + 1}` : `Stage ${i + 1}`}
                   </span>
                 </div>
-                <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-1">{step.title}</h3>
+                <h3 className="text-xl font-bold text-slate-700 dark:text-white mb-1">{step.title}</h3>
                 <p className="text-[var(--text-secondary)] text-base leading-relaxed">{step.desc}</p>
               </div>
             </div>
