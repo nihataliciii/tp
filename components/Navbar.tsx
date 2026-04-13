@@ -70,22 +70,22 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className={`fixed top-0 left-0 right-0 z-[100] transition-transform duration-300 border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-950/90 backdrop-blur-md ${isVisible ? 'translate-y-0' : '-translate-y-full'}`}>
-        <div className="max-w-7xl mx-auto px-4 w-full">
-          <div className="flex items-center h-16 gap-4">
+      <nav className={`fixed top-0 left-0 right-0 z-[100] transition-transform duration-300 border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-950/90 backdrop-blur-md ${isVisible ? 'translate-y-0' : '-translate-y-full'}`} aria-label="Main navigation">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 w-full">
+          <div className="flex items-center h-16">
             
-            {/* Left: Logo */}
-            <Link href="/" className="flex items-center gap-2 shrink-0 mr-4 group" onClick={handleLinkClick}>
+            {/* Left: Logo — shrink-0 prevents it from ever being compressed */}
+            <Link href="/" className="flex items-center gap-2 shrink-0 group" onClick={handleLinkClick}>
               <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white">
                 <Timer size={16} />
               </div>
-              <span className="text-sm font-bold tracking-wide uppercase text-slate-700 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+              <span className="hidden sm:block text-sm font-bold tracking-wide uppercase text-slate-700 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors whitespace-nowrap">
                 TimePerception
               </span>
             </Link>
 
-            {/* Center: Nav Links (desktop) */}
-            <div className="hidden lg:flex flex-1 items-center justify-center gap-6 xl:gap-10 px-8 overflow-x-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            {/* Center: Nav Links (desktop) — min-w-0 prevents overflow into logo/actions */}
+            <div className="hidden lg:flex flex-1 min-w-0 items-center justify-center gap-4 xl:gap-6 px-4">
               {navItems.map((item) => {
                 const isExactActive = pathname === item.href;
                 return (

@@ -22,9 +22,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="bg-slate-50 dark:bg-slate-950 text-slate-700 dark:text-gray-100 min-h-screen">
         <AppProvider>
           <Navbar />
-          {/* pt-32 (128px) ensures NO OVERLAPPING with the fixed 64px Navbar globally */}
-          <main className="pt-32 min-h-[calc(100vh-64px)] w-full max-w-7xl mx-auto px-4 flex flex-col items-center">
-            <div className="w-full flex-col flex items-center justify-center">
+          <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center">
+            {/* Solid spacer equal to fixed Navbar height (64px) + extra breathing room */}
+            <div className="h-20 w-full flex-shrink-0 pointer-events-none" />
+            <div className="w-full flex flex-col items-center">
               {children}
             </div>
           </main>
